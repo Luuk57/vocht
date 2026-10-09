@@ -16,7 +16,6 @@
         .cat-btn { padding: 8px 16px; border: none; background: #e0e0e0; cursor: pointer; border-radius: 20px; font-weight: bold; white-space: nowrap; font-size: 14px; }
         .cat-btn.active { background: #007bff; color: white; }
 
-        /* Strakke tegels zonder vaste cijfers */
         .tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .tile { background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 80px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .tile:active { transform: scale(0.97); background: #f8f9fa; border-color: #007bff; }
@@ -61,7 +60,8 @@
     <!-- Vaste Onderbalk -->
     <div class="cart-footer">
         <div class="cart-summary-bar">
-            <span>Totaal Items: <span id="totalCount" style="color:#007bff;">0</span></span>
+            <span>Items: <span id="totalCount" style="color:#007bff;">0</span></span>
+            <span>Totaal Vocht: <span id="totalFluid" style="color:#17a2b8;">0 ml</span></span>
         </div>
 
         <div class="cart-items-preview" id="cartPreview">
@@ -150,10 +150,17 @@
             const previewContainer = document.getElementById('cartPreview');
             previewContainer.innerHTML = '';
 
+            let totalFluid = 0;
+
             if (cart.length === 0) {
                 previewContainer.innerHTML = '<span style="color: #999; font-size: 12px; display: block; text-align: center;">Nog niets geselecteerd</span>';
             } else {
                 cart.forEach((item, index) => {
+                    // Tel alleen milliliters op voor de totale vloeistofstand
+                    if (item.unit === 'ml') {
+                        totalFluid += item.amount;
+                    }
+
                     const row = document.createElement('div');
                     row.className = 'cart-mini-item';
                     row.innerHTML = `<span>${item.name}</span><span>${item.amount} ${item.unit}</span>`;
@@ -162,6 +169,7 @@
             }
 
             document.getElementById('totalCount').innerText = cart.length;
+            document.getElementById('totalFluid').innerText = `${totalFluid} ml`;
         }
 
         function checkout() {
