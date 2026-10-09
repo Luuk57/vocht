@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS Eten & Drinken met Artikelbeheer</title>
+    <title>POS Eten & Drinken Cloud Sync</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background: #f4f6f9; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
         header { background: #007bff; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .settings-icon { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+        .header-btns { display: flex; gap: 10px; align-items: center; }
+        .icon-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
 
         .main-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 180px; }
 
@@ -34,23 +35,30 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 85%; max-width: 340px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .modal-content h3 { margin-bottom: 15px; color: #333; }
-        .modal-content input, .modal-content select { width: 100%; padding: 10px; font-size: 16px; text-align: center; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 12px; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; font-size: 14px; text-align: center; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 12px; }
         .modal-buttons { display: flex; gap: 10px; }
         .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
         .btn-cancel { background: #e0e0e0; color: #333; }
         .btn-confirm { background: #007bff; color: white; }
 
-        /* Beheer lijst in popup */
-        .manage-list { max-height: 180px; overflow-y: auto; text-align: left; margin-bottom: 15px; border: 1px solid #eee; padding: 5px; border-radius: 6px; }
+        .manage-list { max-height: 150px; overflow-y: auto; text-align: left; margin-bottom: 15px; border: 1px solid #eee; padding: 5px; border-radius: 6px; }
         .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 6px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
         .delete-btn { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        
+        .sync-status { font-size: 11px; color: #e2e8f0; margin-top: 2px; text-align: left; }
     </style>
 </head>
 <body>
 
     <header>
-        <span>POS Eten & Drinken</span>
-        <button class="settings-icon" onclick="openManagerModal()">⚙️</button>
+        <div>
+            <span>POS Eten & Drinken</span>
+            <div class="sync-status" id="syncStatus">Cloud: Niet ingesteld</div>
+        </div>
+        <div class="header-btns">
+            <button class="icon-btn" onclick="syncWithCloud(true)" title="Handmatig synchroniseren">🔄</button>
+            <button class="icon-btn" onclick="openSettingsModal()" title="Instellingen">⚙️</button>
+        </div>
     </header>
 
     <div class="main-container">
@@ -89,14 +97,11 @@
         </div>
     </div>
 
-    <!-- POPUP 2: ARTIKELEN BEHEREN (TOEVOEGEN / VERWIJDEREN) -->
+    <!-- POPUP 2: ARTIKELEN BEHEREN -->
     <div class="modal" id="managerModal">
         <div class="modal-content">
             <h3>Tegels Beheren</h3>
-            
-            <div class="manage-list" id="manageList">
-                <!-- Dynamische lijst van bestaande tegels met verwijderknop -->
-            </div>
+            <div class="manage-list" id="manageList"></div>
 
             <hr style="margin: 15px 0; border:0; border-top:1px solid #eee;">
             
@@ -119,9 +124,25 @@
         </div>
     </div>
 
+    <!-- POPUP 3: INSTELLINGEN / CLOUD SYNC -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h3>Cloud Instellingen</h3>
+            <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Vul hier je JSONBin gegevens in om te synchroniseren tussen apparaten.</p>
+            
+            <input type="text" id="apiKeyInput" placeholder="JSONBin Master Key ($2a$10$...)">
+            <input type="text" id="binIdInput" placeholder="Bin ID (laat leeg om nieuwe te maken)">
+
+            <div class="modal-buttons" style="margin-top: 10px;">
+                <button class="btn-cancel" onclick="closeSettingsModal()">Sluiten</button>
+                <button class="btn-confirm" onclick="saveSettings()">Opslaan & Sync</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Standaard producten (worden opgeslagen in localStorage)
-        let products = JSON.parse(localStorage.getItem('pos_products')) || [
+        // Standaard productdata als fall-back
+        let products = [
             { id: 1, name: 'Koffie', category: 'dranken', unit: 'ml' },
             { id: 2, name: 'Water', category: 'dranken', unit: 'ml' },
             { id: 3, name: 'Thee', category: 'dranken', unit: 'ml' },
@@ -130,12 +151,89 @@
             { id: 6, name: 'Appel', category: 'snacks', unit: 'stuks' }
         ];
 
+        let diary = []; // Opgeslagen dagboek transacties
         let cart = [];
         let selectedProduct = null;
         let currentCategory = 'alle';
 
-        function saveProducts() {
-            localStorage.setItem('pos_products', JSON.stringify(products));
+        // Cloud configuratie uit LocalStorage halen
+        let apiKey = localStorage.getItem('jsonbin_apikey') || '';
+        let binId = localStorage.getItem('jsonbin_binid') || '';
+
+        // Initialiseren bij opstarten
+        window.onload = async () => {
+            if (apiKey && binId) {
+                await syncWithCloud(false);
+            } else {
+                renderTiles();
+            }
+        };
+
+        async function syncWithCloud(showAlert = false) {
+            if (!apiKey) {
+                if (showAlert) alert('Stel eerst je API Key in bij de instellingen (⚙️).');
+                return;
+            }
+
+            document.getElementById('syncStatus').innerText = 'Cloud: Synchroniseren...';
+
+            try {
+                if (!binId) {
+                    // Maak automatisch een nieuwe bin aan als er nog geen ID is
+                    const createRes = await fetch('https://api.jsonbin.io/v3/b', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': apiKey,
+                            'X-Bin-Private': 'true'
+                        },
+                        body: JSON.stringify({ products: products, diary: [] })
+                    });
+                    const createData = await createRes.json();
+                    if (createData.metadata && createData.metadata.id) {
+                        binId = createData.metadata.id;
+                        localStorage.setItem('jsonbin_binid', binId);
+                    } else {
+                        throw new Error('Kon geen Bin aanmaken.');
+                    }
+                }
+
+                // Data ophalen uit de cloud
+                const getRes = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+                    headers: { 'X-Master-Key': apiKey }
+                });
+                const getData = await getRes.json();
+
+                if (getData.record) {
+                    if (getData.record.products) products = getData.record.products;
+                    if (getData.record.diary) diary = getData.record.diary;
+                    document.getElementById('syncStatus').innerText = 'Cloud: Verbonden & Synchroom';
+                    if (showAlert) alert('Synchronisatie gelukt!');
+                }
+                renderTiles(currentCategory);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('syncStatus').innerText = 'Cloud: Fout bij sync';
+                if (showAlert) alert('Fout bij synchroniseren. Controleer je API Key.');
+            }
+        }
+
+        async function pushToCloud() {
+            if (!apiKey || !binId) return;
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': apiKey
+                    },
+                    body: JSON.stringify({ products: products, diary: diary })
+                });
+                document.getElementById('syncStatus').innerText = 'Cloud: Opgeslagen';
+            } catch (error) {
+                console.error(error);
+                document.getElementById('syncStatus').innerText = 'Cloud: Opslaan mislukt';
+            }
         }
 
         function renderTiles(category = 'alle') {
@@ -182,7 +280,8 @@
             cart.push({
                 name: selectedProduct.name,
                 amount: amount,
-                unit: selectedProduct.unit
+                unit: selectedProduct.unit,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             });
 
             updateUI();
@@ -212,17 +311,44 @@
             document.getElementById('totalFluid').innerText = `${totalFluid} ml`;
         }
 
-        function checkout() {
+        async function checkout() {
             if (cart.length === 0) {
                 alert('Selecteer eerst een product!');
                 return;
             }
-            alert('Boeking succesvol opgeslagen in je dagboek!');
+            
+            // Voeg toe aan het dagboek logboek
+            diary.push({
+                date: new Date().toISOString().split('T')[0],
+                items: [...cart]
+            });
+
+            await pushToCloud();
+            alert('Boeking succesvol opgeslagen in de cloud!');
             cart = [];
             updateUI();
         }
 
-        // --- BEHEER FUNCTIES ---
+        // --- BEHEER & INSTELLINGEN ---
+        function openSettingsModal() {
+            document.getElementById('apiKeyInput').value = apiKey;
+            document.getElementById('binIdInput').value = binId;
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function saveSettings() {
+            apiKey = document.getElementById('apiKeyInput').value.trim();
+            binId = document.getElementById('binIdInput').value.trim();
+            localStorage.setItem('jsonbin_apikey', apiKey);
+            localStorage.setItem('jsonbin_binid', binId);
+            closeSettingsModal();
+            syncWithCloud(true);
+        }
+
         function openManagerModal() {
             renderManageList();
             document.getElementById('managerModal').style.display = 'flex';
@@ -230,7 +356,7 @@
 
         function closeManagerModal() {
             document.getElementById('managerModal').style.display = 'none';
-            renderTiles(currentCategory); // Ververs het hoofdgrid direct
+            renderTiles(currentCategory);
         }
 
         function renderManageList() {
@@ -248,7 +374,7 @@
             });
         }
 
-        function addNewProduct() {
+        async function addNewProduct() {
             const name = document.getElementById('newProdName').value.trim();
             const category = document.getElementById('newProdCategory').value;
             const unit = document.getElementById('newProdUnit').value;
@@ -260,21 +386,23 @@
 
             const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
             products.push({ id: newId, name, category, unit });
-            saveProducts();
-
+            
+            await pushToCloud();
             document.getElementById('newProdName').value = '';
             renderManageList();
         }
 
-        function deleteProduct(id) {
+        async function deleteProduct(id) {
             if (confirm('Weet je zeker dat je deze tegel wilt verwijderen?')) {
                 products = products.filter(p => p.id !== id);
-                saveProducts();
+                await pushToCloud();
                 renderManageList();
             }
         }
 
-        renderTiles();
+        // Koppel de beheer-functie aan het tandwiel-icoon via een dubbelklik of lange druk of vervang optie in menu
+        document.querySelector('.header-btns .icon-btn[title="Instellingen"]').onclick = openManagerModal;
+        // Maak een extra optie of dubbelklik voor cloud instellingen (of voeg knop toe)
     </script>
 </body>
 </html>
