@@ -9,8 +9,9 @@
         body { background: #f4f6f9; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
         header { background: #007bff; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .header-btns { display: flex; gap: 10px; align-items: center; }
-        .icon-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+        .header-btns { display: flex; gap: 8px; align-items: center; }
+        .icon-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .icon-btn:active { background: rgba(255,255,255,0.4); }
 
         .main-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 180px; }
 
@@ -35,7 +36,7 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 85%; max-width: 340px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .modal-content h3 { margin-bottom: 15px; color: #333; }
-        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; font-size: 14px; text-align: center; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 12px; }
+        .modal-content input, .modal-content select { width: 100%; padding: 10px; font-size: 14px; text-align: center; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 12px; }
         .modal-buttons { display: flex; gap: 10px; }
         .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
         .btn-cancel { background: #e0e0e0; color: #333; }
@@ -56,8 +57,8 @@
             <div class="sync-status" id="syncStatus">Cloud: Niet ingesteld</div>
         </div>
         <div class="header-btns">
-            <button class="icon-btn" onclick="syncWithCloud(true)" title="Handmatig synchroniseren">🔄</button>
-            <button class="icon-btn" onclick="openSettingsModal()" title="Instellingen">⚙️</button>
+            <button class="icon-btn" onclick="openManagerModal()" title="Tegels Beheren">⚙️</button>
+            <button class="icon-btn" onclick="openSettingsModal()" title="Cloud Instellingen">☁️</button>
         </div>
     </header>
 
@@ -97,7 +98,7 @@
         </div>
     </div>
 
-    <!-- POPUP 2: ARTIKELEN BEHEREN -->
+    <!-- POPUP 2: ARTIKELEN BEHEREN (⚙️) -->
     <div class="modal" id="managerModal">
         <div class="modal-content">
             <h3>Tegels Beheren</h3>
@@ -124,14 +125,14 @@
         </div>
     </div>
 
-    <!-- POPUP 3: INSTELLINGEN / CLOUD SYNC -->
+    <!-- POPUP 3: CLOUD INSTELLINGEN (☁️) -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <h3>Cloud Instellingen</h3>
-            <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Vul hier je JSONBin gegevens in om te synchroniseren tussen apparaten.</p>
+            <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Plak hier je JSONBin Master Key:</p>
             
-            <input type="text" id="apiKeyInput" placeholder="JSONBin Master Key ($2a$10$...)">
-            <input type="text" id="binIdInput" placeholder="Bin ID (laat leeg om nieuwe te maken)">
+            <input type="text" id="apiKeyInput" placeholder="API Key ($2a$10$...)">
+            <input type="text" id="binIdInput" placeholder="Bin ID (laat leeg, maakt vanzelf aan)">
 
             <div class="modal-buttons" style="margin-top: 10px;">
                 <button class="btn-cancel" onclick="closeSettingsModal()">Sluiten</button>
@@ -141,7 +142,6 @@
     </div>
 
     <script>
-        // Standaard productdata als fall-back
         let products = [
             { id: 1, name: 'Koffie', category: 'dranken', unit: 'ml' },
             { id: 2, name: 'Water', category: 'dranken', unit: 'ml' },
@@ -151,16 +151,14 @@
             { id: 6, name: 'Appel', category: 'snacks', unit: 'stuks' }
         ];
 
-        let diary = []; // Opgeslagen dagboek transacties
+        let diary = [];
         let cart = [];
         let selectedProduct = null;
         let currentCategory = 'alle';
 
-        // Cloud configuratie uit LocalStorage halen
         let apiKey = localStorage.getItem('jsonbin_apikey') || '';
         let binId = localStorage.getItem('jsonbin_binid') || '';
 
-        // Initialiseren bij opstarten
         window.onload = async () => {
             if (apiKey && binId) {
                 await syncWithCloud(false);
@@ -171,7 +169,7 @@
 
         async function syncWithCloud(showAlert = false) {
             if (!apiKey) {
-                if (showAlert) alert('Stel eerst je API Key in bij de instellingen (⚙️).');
+                if (showAlert) alert('Stel eerst je API Key in via het wolkje (☁️).');
                 return;
             }
 
@@ -179,7 +177,6 @@
 
             try {
                 if (!binId) {
-                    // Maak automatisch een nieuwe bin aan als er nog geen ID is
                     const createRes = await fetch('https://api.jsonbin.io/v3/b', {
                         method: 'POST',
                         headers: {
@@ -198,7 +195,6 @@
                     }
                 }
 
-                // Data ophalen uit de cloud
                 const getRes = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
                     headers: { 'X-Master-Key': apiKey }
                 });
@@ -207,8 +203,8 @@
                 if (getData.record) {
                     if (getData.record.products) products = getData.record.products;
                     if (getData.record.diary) diary = getData.record.diary;
-                    document.getElementById('syncStatus').innerText = 'Cloud: Verbonden & Synchroom';
-                    if (showAlert) alert('Synchronisatie gelukt!');
+                    document.getElementById('syncStatus').innerText = 'Cloud: Verbonden';
+                    if (showAlert) alert('Verbonden & gesynchroniseerd!');
                 }
                 renderTiles(currentCategory);
             } catch (error) {
@@ -317,7 +313,6 @@
                 return;
             }
             
-            // Voeg toe aan het dagboek logboek
             diary.push({
                 date: new Date().toISOString().split('T')[0],
                 items: [...cart]
@@ -329,7 +324,7 @@
             updateUI();
         }
 
-        // --- BEHEER & INSTELLINGEN ---
+        // --- CLOUD INSTELLINGEN (☁️) ---
         function openSettingsModal() {
             document.getElementById('apiKeyInput').value = apiKey;
             document.getElementById('binIdInput').value = binId;
@@ -349,6 +344,7 @@
             syncWithCloud(true);
         }
 
+        // --- TEGEL BEHEER (⚙️) ---
         function openManagerModal() {
             renderManageList();
             document.getElementById('managerModal').style.display = 'flex';
@@ -400,9 +396,7 @@
             }
         }
 
-        // Koppel de beheer-functie aan het tandwiel-icoon via een dubbelklik of lange druk of vervang optie in menu
-        document.querySelector('.header-btns .icon-btn[title="Instellingen"]').onclick = openManagerModal;
-        // Maak een extra optie of dubbelklik voor cloud instellingen (of voeg knop toe)
+        renderTiles();
     </script>
 </body>
 </html>
