@@ -3,47 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS Eten & Drinken Tracker</title>
+    <title>POS Eten & Drinken Mobile</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background: #f4f6f9; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Layout: Links het POS grid, rechts de kassarol */
-        .pos-grid-container { flex: 2; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
-        .pos-cart-container { flex: 1; background: #ffffff; border-left: 1px solid #ddd; display: flex; flex-direction: column; padding: 20px; box-shadow: -2px 0 5px rgba(0,0,0,0.05); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: #f4f6f9; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        h2 { margin-bottom: 15px; color: #333; }
+        /* Header */
+        header { background: #007bff; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-        /* Categorie knoppen */
-        .categories { display: flex; gap: 10px; margin-bottom: 15px; }
-        .cat-btn { padding: 10px 15px; border: none; background: #e0e0e0; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        /* Hoofdcontainer (Schuifbaar) */
+        .main-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 180px; }
+
+        /* Categorie knoppen (Horizontaal scrollbaar) */
+        .categories { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .cat-btn { padding: 8px 16px; border: none; background: #e0e0e0; cursor: pointer; border-radius: 20px; font-weight: bold; white-space: nowrap; font-size: 14px; }
         .cat-btn.active { background: #007bff; color: white; }
 
-        /* Product Tegels Grid */
-        .tile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
-        .tile { background: white; border: 2px solid #ddd; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: 0.1s; display: flex; flex-direction: column; justify-content: space-between; height: 100px; }
-        .tile:hover { transform: scale(1.02); border-color: #007bff; }
-        .tile-title { font-weight: bold; font-size: 14px; color: #333; }
-        .tile-info { font-size: 12px; color: #666; }
+        /* Product Tegels Grid (Mobiel geoptimaliseerd) */
+        .tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .tile { background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 90px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .tile:active { transform: scale(0.97); background: #f8f9fa; }
+        .tile-title { font-weight: bold; font-size: 15px; color: #333; }
+        .tile-info { font-size: 12px; color: #666; margin-top: 5px; }
 
-        /* Kassarol (Cart) */
-        .cart-items { flex-grow: 1; overflow-y: auto; border-bottom: 1px solid #ddd; margin-bottom: 15px; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-        .cart-item-details { display: flex; flex-direction: column; }
-        .cart-item-sub { font-size: 11px; color: #888; }
+        /* Vaste Onderbalk / Winkelmandje (Sticky Footer) */
+        .cart-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #ddd; padding: 15px; box-shadow: 0 -4px 10px rgba(0,0,0,0.08); border-radius: 20px 20px 0 0; max-height: 50vh; display: flex; flex-direction: column; }
         
-        /* Totalen & Afrekenen */
-        .totals { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .total-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 15px; font-weight: bold; }
-        .checkout-btn { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .checkout-btn:hover { background: #218838; }
+        .cart-summary-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 15px; font-weight: bold; color: #333; }
+        
+        /* Kleine kassarol in de footer */
+        .cart-items-preview { max-height: 100px; overflow-y: auto; margin-bottom: 10px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 5px 0; }
+        .cart-mini-item { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: #555; }
+
+        .checkout-btn { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; }
+        .checkout-btn:active { background: #218838; }
     </style>
 </head>
 <body>
 
-    <!-- POS SCHERM (TEGELS) -->
-    <div class="pos-grid-container">
-        <h2>POS Invoer</h2>
+    <header>POS Eten & Drinken</header>
+
+    <!-- INHOUD (TEGELS) -->
+    <div class="main-container">
         <div class="categories">
             <button class="cat-btn active" onclick="filterCategory('alle')">Alles</button>
             <button class="cat-btn" onclick="filterCategory('dranken')">Dranken</button>
@@ -51,67 +52,60 @@
             <button class="cat-btn" onclick="filterCategory('snacks')">Snacks</button>
         </div>
         <div class="tile-grid" id="tileGrid">
-            <!-- Wordt dynamisch gevuld via JavaScript -->
+            <!-- Wordt dynamisch gevuld -->
         </div>
     </div>
 
-    <!-- KASSAROL / WINKELMANDJE -->
-    <div class="pos-cart-container">
-        <h2>Huidige Inname</h2>
-        <div class="cart-items" id="cartItems">
-            <p style="color: #999; text-align: center; margin-top: 20px;">Nog geen producten toegevoegd</p>
+    <!-- VASTE BALK ONDERIN VOOR TELEFOON -->
+    <div class="cart-footer">
+        <div class="cart-summary-bar">
+            <span>Totaal: <span id="totalCalories" style="color:#007bff;">0 kcal</span></span>
+            <span>Vocht: <span id="totalFluid" style="color:#17a2b8;">0 ml</span></span>
         </div>
-        
-        <div class="totals">
-            <div class="total-row"><span>Totaal Calorieën:</span> <span id="totalCalories">0 kcal</span></div>
-            <div class="total-row"><span>Totaal Vocht:</span> <span id="totalFluid">0 ml</span></div>
+
+        <div class="cart-items-preview" id="cartPreview">
+            <span style="color: #999; font-size: 12px; display: block; text-align: center;">Nog niets geselecteerd</span>
         </div>
 
         <button class="checkout-btn" onclick="checkout()">Boek naar Dagboek</button>
     </div>
 
     <script>
-        // Database van artikelen (Producten)
         const products = [
-            { id: 1, name: 'Koffie (Zwart)', category: 'dranken', calories: 5, fluid: 200, unit: 'kop' },
-            { id: 2, name: 'Glas Water', category: 'dranken', calories: 0, fluid: 250, unit: 'glas' },
-            { id: 3, name: 'Thee met melk', category: 'dranken', calories: 20, fluid: 200, unit: 'mok' },
-            { id: 4, name: 'Volkoren Boterham', category: 'maaltijd', calories: 82, fluid: 0, unit: 'stuk' },
-            { id: 5, name: 'Kop Soep', category: 'dranken', calories: 75, fluid: 250, unit: 'kom' },
-            { id: 6, name: 'Appel', category: 'snacks', calories: 60, fluid: 100, unit: 'stuk' }
+            { id: 1, name: 'Koffie (Zwart)', category: 'dranken', calories: 5, fluid: 200 },
+            { id: 2, name: 'Glas Water', category: 'dranken', calories: 0, fluid: 250 },
+            { id: 3, name: 'Thee met melk', category: 'dranken', calories: 20, fluid: 200 },
+            { id: 4, name: 'Volkoren Boterham', category: 'maaltijd', calories: 82, fluid: 0 },
+            { id: 5, name: 'Kop Soep', category: 'dranken', calories: 75, fluid: 250 },
+            { id: 6, name: 'Appel', category: 'snacks', calories: 60, fluid: 100 }
         ];
 
         let cart = [];
 
-        // Render tegels op het scherm
         function renderTiles(category = 'alle') {
             const grid = document.getElementById('tileGrid');
             grid.innerHTML = '';
 
-            const filteredProducts = category === 'alle' 
-                ? products 
-                : products.filter(p => p.category === category);
+            const filtered = category === 'alle' ? products : products.filter(p => p.category === category);
 
-            filteredProducts.forEach(product => {
+            filtered.forEach(product => {
                 const tile = document.createElement('div');
                 tile.className = 'tile';
                 tile.onclick = () => addToCart(product);
                 tile.innerHTML = `
                     <div class="tile-title">${product.name}</div>
-                    <div class="tile-info">${product.calories} kcal | ${product.fluid} ml</div>
+                    <div class="tile-info">${product.calories} kcal<br>${product.fluid} ml</div>
                 `;
                 grid.appendChild(tile);
             });
         }
 
-        // Categorie filteren
         function filterCategory(category) {
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             renderTiles(category);
         }
 
-        // Voeg toe aan kassarol
         function addToCart(product) {
             const existing = cart.find(item => item.id === product.id);
             if (existing) {
@@ -119,62 +113,43 @@
             } else {
                 cart.push({ ...product, quantity: 1 });
             }
-            updateCartUI();
+            updateUI();
         }
 
-        // Update kassarol en totalen
-        function updateCartUI() {
-            const cartContainer = document.getElementById('cartItems');
-            cartContainer.innerHTML = '';
-
-            if (cart.length === 0) {
-                cartContainer.innerHTML = '<p style="color: #999; text-align: center; margin-top: 20px;">Nog geen producten toegevoegd</p>';
-                document.getElementById('totalCalories').innerText = '0 kcal';
-                document.getElementById('totalFluid').innerText = '0 ml';
-                return;
-            }
-
+        function updateUI() {
             let totalCal = 0;
             let totalFluid = 0;
+            const previewContainer = document.getElementById('cartPreview');
+            previewContainer.innerHTML = '';
 
-            cart.forEach((item, index) => {
-                totalCal += item.calories * item.quantity;
-                totalFluid += item.fluid * item.quantity;
+            if (cart.length === 0) {
+                previewContainer.innerHTML = '<span style="color: #999; font-size: 12px; display: block; text-align: center;">Nog niets geselecteerd</span>';
+            } else {
+                cart.forEach(item => {
+                    totalCal += item.calories * item.quantity;
+                    totalFluid += item.fluid * item.quantity;
 
-                const itemRow = document.createElement('div');
-                itemRow.className = 'cart-item';
-                itemRow.innerHTML = `
-                    <div class="cart-item-details">
-                        <span>${item.name} (x${item.quantity})</span>
-                        <span class="cart-item-sub">${item.calories * item.quantity} kcal, ${item.fluid * item.quantity} ml</span>
-                    </div>
-                    <button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold;">✕</button>
-                `;
-                cartContainer.appendChild(itemRow);
-            });
+                    const row = document.createElement('div');
+                    row.className = 'cart-mini-item';
+                    row.innerHTML = `<span>${item.name} (x${item.quantity})</span><span>${item.calories * item.quantity} kcal</span>`;
+                    previewContainer.appendChild(row);
+                });
+            }
 
             document.getElementById('totalCalories').innerText = `${totalCal} kcal`;
             document.getElementById('totalFluid').innerText = `${totalFluid} ml`;
         }
 
-        // Verwijder item uit kassarol
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-        }
-
-        // "Afrekenen" (Boeken naar dagboek)
         function checkout() {
             if (cart.length === 0) {
-                alert('Voeg eerst items toe!');
+                alert('Tik eerst op een product!');
                 return;
             }
-            alert('Transactie succesvol geboekt naar je dagboek!');
+            alert('Succesvol geboekt!');
             cart = [];
-            updateCartUI();
+            updateUI();
         }
 
-        // Initialiseer bij openen
         renderTiles();
     </script>
 </body>
