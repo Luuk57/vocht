@@ -24,7 +24,6 @@
         .cat-btn { padding: 6px 14px; border: none; background: #e0e0e0; cursor: pointer; border-radius: 20px; font-weight: bold; white-space: nowrap; font-size: 13px; }
         .cat-btn.active { background: #007bff; color: white; }
 
-        /* Tegels ~40% kleiner gemaakt (4 kolommen in plaats van 2) */
         .tile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .tile { background: white; border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 60px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .tile:active { transform: scale(0.97); background: #f8f9fa; border-color: #007bff; }
@@ -42,6 +41,7 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .modal-content h3 { margin-bottom: 15px; color: #333; }
+        .modal-content label { display: block; font-size: 13px; font-weight: bold; text-align: left; margin-bottom: 4px; color: #555; }
         .modal-content input, .modal-content select { width: 100%; padding: 10px; font-size: 14px; text-align: center; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 12px; }
         .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
         .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
@@ -67,6 +67,7 @@
             <div class="sync-status" id="syncStatus">Cloud: Niet ingesteld</div>
         </div>
         <div class="header-btns">
+            <button class="icon-btn" onclick="openReportModal()" title="Periode Rapport / PDF">📄</button>
             <button class="icon-btn" onclick="openDiaryModal()" title="Dagboek / Overzicht">📊</button>
             <button class="icon-btn" onclick="openManagerModal()" title="Tegels Beheren">⚙️</button>
             <button class="icon-btn" onclick="openSettingsModal()" title="Cloud Instellingen">☁️</button>
@@ -100,7 +101,7 @@
         </div>
 
         <div class="cart-items-preview" id="cartPreview">
-            <span style="color: #999; font-size: 12px; display: block; text-align: center;">Nog niets geselecteerd</span>
+            <span style="color: #999; font-size: 11px; display: block; text-align: center;">Nog niets geselecteerd</span>
         </div>
 
         <button class="checkout-btn" onclick="checkout()">Boek naar Dagboek</button>
@@ -118,7 +119,22 @@
         </div>
     </div>
 
-    <!-- POPUP 2: DAGBOEK / OVERZICHT (📊) -->
+    <!-- POPUP 2: RAPPORTAGE PERIODE (📄) -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <h3>Rapportage / PDF</h3>
+            <label>Startdatum:</label>
+            <input type="date" id="startDate">
+            <label>Einddatum:</label>
+            <input type="date" id="endDate">
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeReportModal()">Sluiten</button>
+                <button class="btn-confirm" onclick="generatePDFReport()">Genereer PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP 3: DAGBOEK / OVERZICHT (📊) -->
     <div class="modal" id="diaryModal">
         <div class="modal-content" style="max-width: 420px;">
             <h3>Dagboek & Totaaloverzicht</h3>
@@ -127,7 +143,7 @@
         </div>
     </div>
 
-    <!-- POPUP 3: ARTIKELEN BEHEREN (⚙️) -->
+    <!-- POPUP 4: ARTIKELEN BEHEREN (⚙️) -->
     <div class="modal" id="managerModal">
         <div class="modal-content">
             <h3>Tegels Beheren</h3>
@@ -154,7 +170,7 @@
         </div>
     </div>
 
-    <!-- POPUP 4: CLOUD INSTELLINGEN (☁️) -->
+    <!-- POPUP 5: CLOUD INSTELLINGEN (☁️) -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <h3>Cloud Instellingen</h3>
@@ -189,7 +205,13 @@
         let binId = localStorage.getItem('jsonbin_binid') || '';
 
         window.onload = async () => {
+            const todayStr = new Date().toISOString().split('T')[0];
             document.getElementById('todayDateStr').innerText = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+            
+            // Standaard datums in rapport modal op vandaag zetten
+            document.getElementById('startDate').value = todayStr;
+            document.getElementById('endDate').value = todayStr;
+
             if (apiKey && binId) {
                 await syncWithCloud(false);
             } else {
@@ -371,6 +393,91 @@
             alert('Boeking succesvol opgeslagen in de cloud!');
             cart = [];
             updateUI();
+        }
+
+        // --- RAPPORTAGE & PDF (📄) ---
+        function openReportModal() {
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+        }
+
+        function generatePDFReport() {
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+
+            if (!start || !end) {
+                alert('Selecteer een start- en einddatum.');
+                return;
+            }
+
+            // Filter diary op periode
+            const filtered = diary.filter(entry => entry.date >= start && entry.date <= end);
+
+            if (filtered.length === 0) {
+                alert('Geen gegevens gevonden in deze periode.');
+                return;
+            }
+
+            // Bouw een schone afdrukpagina / PDF op in een nieuw tabblad
+            let reportHTML = `
+                <html>
+                <head>
+                    <title>Inname Rapport ${start} t/m ${end}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                        h2 { color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 5px; }
+                        .day-section { margin-bottom: 20px; border: 1px solid #ccc; padding: 10px; border-radius: 6px; }
+                        .day-header { font-weight: bold; font-size: 16px; background: #f0f0f0; padding: 6px; display: flex; justify-content: space-between; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+                        th, td { border: 1px solid #ddd; padding: 6px 10px; font-size: 14px; text-align: left; }
+                        th { background: #f8f9fa; }
+                        .total-fluid { font-weight: bold; color: #17a2b8; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Inname & Vocht Rapport</h2>
+                    <p><b>Periode:</b> ${start} t/m ${end}</p>
+            `;
+
+            filtered.forEach(entry => {
+                let dayFluid = 0;
+                let rows = '';
+                entry.items.forEach(i => {
+                    if (i.unit === 'ml') dayFluid += i.amount;
+                    rows += `<tr><td>${i.name}</td><td>${i.time || '-'}</td><td>${i.amount} ${i.unit}</td></tr>`;
+                });
+
+                reportHTML += `
+                    <div class="day-section">
+                        <div class="day-header">
+                            <span>Datum: ${entry.date}</span>
+                            <span class="total-fluid">Totaal Vocht: ${dayFluid} ml</span>
+                        </div>
+                        <table>
+                            <tr><th>Product</th><th>Tijd</th><th>Hoeveelheid</th></tr>
+                            ${rows}
+                        </table>
+                    </div>
+                `;
+            });
+
+            reportHTML += `
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    }
+                <\/script>
+                </body>
+                </html>
+            `;
+
+            const win = window.open('', '_blank');
+            win.document.write(reportHTML);
+            win.document.close();
+            closeReportModal();
         }
 
         // --- DAGBOEK / OVERZICHT (📊) ---
