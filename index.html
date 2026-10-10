@@ -14,7 +14,6 @@
         .icon-btn { background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: white; width: 38px; height: 38px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
         .icon-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.94); }
 
-        /* Automatische PDF-banner */
         .auto-pdf-banner { background: #e6fffa; border: 2px solid #319795; border-radius: 12px; padding: 12px 15px; margin: 12px 15px 0 15px; display: none; text-align: center; animation: pulse 2s infinite; box-shadow: 0 4px 12px rgba(49,151,149,0.2); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(49,151,149, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(49,151,149, 0); } 100% { box-shadow: 0 0 0 0 rgba(49,151,149, 0); } }
         .auto-pdf-title { font-size: 12px; font-weight: 800; color: #234e52; text-transform: uppercase; margin-bottom: 4px; }
@@ -84,7 +83,6 @@
         </div>
     </header>
 
-    <!-- Automatische PDF Melding & Knop -->
     <div class="auto-pdf-banner" id="autoPdfBanner">
         <div class="auto-pdf-title">⏰ Tijd bereikt! Dagelijkse Eten & Drinken PDF nog niet gemaakt</div>
         <div style="font-size: 12px; color: #234e52;">Genereer en download het rapport om de melding te voltooien voor DriveSync.</div>
@@ -122,7 +120,6 @@
         <button class="checkout-btn" onclick="checkout()">Boek naar Dagboek</button>
     </div>
 
-    <!-- POPUP 1: HOEVEELHEID -->
     <div class="modal" id="amountModal">
         <div class="modal-content">
             <h3 id="modalTitle">Hoeveelheid</h3>
@@ -134,7 +131,6 @@
         </div>
     </div>
 
-    <!-- POPUP 2: RAPPORTAGE (PDF / EXCEL) -->
     <div class="modal" id="reportModal">
         <div class="modal-content">
             <h3>Rapportage & Export</h3>
@@ -150,7 +146,6 @@
         </div>
     </div>
 
-    <!-- POPUP 3: DAGBOEK / OVERZICHT (Met bewerk knop!) -->
     <div class="modal" id="diaryModal">
         <div class="modal-content" style="max-width: 420px;">
             <h3>Dagboek & Overzicht</h3>
@@ -159,7 +154,6 @@
         </div>
     </div>
 
-    <!-- POPUP 4: ARTIKELEN BEHEER -->
     <div class="modal" id="managerModal">
         <div class="modal-content">
             <h3>Tegels Beheren</h3>
@@ -183,7 +177,6 @@
         </div>
     </div>
 
-    <!-- POPUP 5: CLOUD & TIJD INSTELLINGEN -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <h3>Instellingen & Cloud</h3>
@@ -619,8 +612,8 @@
 
             apiKey = document.getElementById('apiKeyInput').value.trim();
             binId = document.getElementById('binIdInput').value.trim();
-            localStorage.setItem('jsonbin_apikey', apiKey);
-            localStorage.setItem('jsonbin_binid', binId);
+            localStorage.setItem('food_jsonbin_apikey', apiKey);
+            localStorage.setItem('food_jsonbin_binid', binId);
             closeSettingsModal();
             syncWithCloud(true);
             checkAutoPDFTrigger();
