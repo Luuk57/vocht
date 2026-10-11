@@ -2,140 +2,228 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eten & Drinken Monitor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+
+    <title>LCARS - ETEN & DRINKEN MONITOR</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&display=swap');
+
         :root {
-            --bg-base: #030508;
-            --surface-glass: rgba(13, 17, 28, 0.85);
-            --surface-card: rgba(18, 24, 38, 0.75);
-            --border-glass: rgba(0, 242, 254, 0.2);
-            --neon-cyan: #00f2fe;
-            --neon-blue: #4facfe;
-            --neon-green: #10b981;
-            --neon-orange: #f59e0b;
-            --neon-red: #ef4444;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --lcars-orange: #ff9900;
+            --lcars-tangerine: #ff6600;
+            --lcars-tan: #ffcc99;
+            --lcars-purple: #cc99cc;
+            --lcars-blue: #99ccff;
+            --lcars-red: #cc3333;
+            --lcars-amber: #ffcc00;
+            --lcars-gray: #112233;
+            --lcars-bg: #000000;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background: var(--bg-base); color: var(--text-main); min-height: 100vh; padding: 15px; padding-bottom: 240px; background-image: radial-gradient(circle at 50% 10%, #0c1425 0%, var(--bg-base) 100%); display: flex; flex-direction: column; align-items: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Antonio', -apple-system, sans-serif; user-select: none; }
 
-        header { background: var(--surface-glass); border: 1px solid var(--border-glass); border-radius: 14px; padding: 12px 18px; width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; backdrop-filter: blur(10px); }
-        .app-title { font-size: 15px; font-weight: 800; color: var(--neon-cyan); letter-spacing: 1px; }
-        .header-btns { display: flex; gap: 6px; align-items: center; }
-        .icon-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border-glass); color: white; width: 36px; height: 36px; border-radius: 50%; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .icon-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.95); }
+        body {
+            background-color: var(--lcars-bg);
+            color: var(--lcars-orange);
+            width: 100vw; height: 100vh;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            padding: 8px;
+        }
+
+        /* Top LCARS Header Frame */
+        .lcars-top-frame {
+            display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;
+        }
+
+        .lcars-top-row { display: flex; align-items: center; gap: 6px; }
+
+        .lcars-elbow-top {
+            background: var(--lcars-tan);
+            height: 42px; width: 100px;
+            border-top-left-radius: 22px;
+            display: flex; align-items: flex-end; padding: 4px 8px;
+            color: #000; font-weight: bold; font-size: 15px; letter-spacing: 1px;
+        }
+
+        .lcars-top-bar {
+            flex: 1; height: 20px;
+            background: var(--lcars-orange);
+            border-radius: 0 10px 10px 0;
+            display: flex; align-items: center; justify-content: flex-end;
+            padding-right: 10px; color: #000; font-weight: bold; font-size: 11px;
+        }
+
+        .lcars-header-title {
+            font-size: 17px; font-weight: bold; color: #ffffff;
+            letter-spacing: 1.5px; padding-left: 6px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
 
         /* Automatische PDF-banner */
-        .auto-pdf-banner { background: rgba(0, 242, 254, 0.1); border: 2px solid var(--neon-cyan); border-radius: 12px; padding: 14px; width: 100%; max-width: 500px; margin-bottom: 15px; display: none; text-align: center; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0,242,254, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0,242,254, 0); } 100% { box-shadow: 0 0 0 0 rgba(0,242,254, 0); } }
-        .auto-pdf-title { font-size: 12px; font-weight: 800; color: var(--neon-cyan); text-transform: uppercase; margin-bottom: 6px; }
-        .btn-auto-pdf { background: var(--neon-cyan); color: #030508; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; width: 100%; margin-top: 6px; }
+        .auto-pdf-banner {
+            background: rgba(255, 153, 0, 0.15); border: 2px solid var(--lcars-orange);
+            border-radius: 10px; padding: 10px; margin-bottom: 8px; text-align: center; display: none;
+        }
+        .auto-pdf-title { font-size: 11px; font-weight: bold; color: var(--lcars-orange); text-transform: uppercase; margin-bottom: 4px; }
+        .btn-auto-pdf { background: var(--lcars-orange); color: #000; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; margin-top: 4px; }
 
-        .main-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
+        /* Actiebalk / Header Cirkelknopjes */
+        .header-btns { display: flex; gap: 5px; margin-bottom: 8px; }
+        .icon-btn {
+            flex: 1; background: var(--lcars-purple); color: #000; border: none;
+            padding: 7px; font-weight: bold; font-size: 11px; text-transform: uppercase;
+            border-radius: 10px; cursor: pointer; text-align: center;
+        }
+        .icon-btn:active { background: #fff; }
+        .icon-btn.tan { background: var(--lcars-tan); }
+        .icon-btn.blue { background: var(--lcars-blue); }
+        .icon-btn.red { background: var(--lcars-red); color: #fff; }
 
-        .today-widget { background: var(--surface-card); border: 1px solid var(--border-glass); border-radius: 16px; padding: 18px; backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
-        .today-widget-title { font-size: 11px; color: var(--text-muted); font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 2px; }
-        .today-widget-date { font-size: 13px; color: var(--text-main); font-weight: 500; }
-        .today-widget-value { font-size: 24px; font-weight: 900; color: var(--neon-cyan); }
+        /* Main Scrollable Area */
+        .lcars-mobile-container {
+            flex: 1; display: flex; flex-direction: column;
+            gap: 10px; overflow-y: auto; padding-right: 2px; padding-bottom: 110px;
+        }
 
-        .categories { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-        .cat-btn { padding: 8px 16px; border: 1px solid var(--border-glass); background: #0f172a; color: var(--text-muted); cursor: pointer; border-radius: 20px; font-weight: 700; white-space: nowrap; font-size: 12px; transition: all 0.2s; }
-        .cat-btn.active { background: var(--neon-cyan); color: #030508; border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0,242,254,0.3); }
+        .today-widget {
+            background: rgba(15, 20, 30, 0.9); border: 2px solid var(--lcars-tan);
+            border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center;
+            position: relative;
+        }
+        .today-widget::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%;
+            background: var(--lcars-tan); border-radius: 8px 0 0 8px;
+        }
+        .today-widget-title { font-size: 10px; color: var(--lcars-tan); font-weight: bold; text-transform: uppercase; }
+        .today-widget-date { font-size: 12px; color: #fff; }
+        .today-widget-value { font-size: 22px; font-weight: bold; color: var(--lcars-orange); }
 
-        .tile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .tile { background: var(--surface-card); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px 8px; text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 75px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.15s ease; backdrop-filter: blur(10px); }
-        .tile:active { transform: scale(0.95); background: rgba(0,242,254,0.1); border-color: var(--neon-cyan); }
-        .tile-title { font-weight: 700; font-size: 12px; color: var(--text-main); word-break: break-word; line-height: 1.3; }
+        .categories { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+        .cat-btn {
+            padding: 6px 12px; border: 1px solid var(--lcars-blue); background: #000;
+            color: var(--lcars-blue); cursor: pointer; border-radius: 14px; font-weight: bold;
+            white-space: nowrap; font-size: 11px; text-transform: uppercase;
+        }
+        .cat-btn.active { background: var(--lcars-blue); color: #000; border-color: var(--lcars-blue); }
 
-        /* Vaste Onderbalk */
-        .cart-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(13, 17, 28, 0.95); border-top: 1px solid var(--border-glass); padding: 15px 18px; backdrop-filter: blur(15px); border-radius: 20px 20px 0 0; display: flex; flex-direction: column; align-items: center; z-index: 50; }
-        .cart-inner { width: 100%; max-width: 500px; }
-        .cart-summary-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: 700; color: var(--text-main); }
-        .cart-items-preview { max-height: 70px; overflow-y: auto; margin-bottom: 10px; border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 4px 0; }
-        .cart-mini-item { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; color: var(--text-muted); font-weight: 500; }
-        .checkout-btn { width: 100%; padding: 12px; background: var(--neon-green); color: #030508; border: none; border-radius: 10px; font-size: 15px; font-weight: 800; cursor: pointer; text-align: center; box-shadow: 0 0 12px rgba(16,185,129,0.3); }
-        .checkout-btn:active { transform: scale(0.98); }
+        .tile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .tile {
+            background: rgba(10, 15, 25, 0.9); border: 1px solid var(--lcars-orange);
+            border-radius: 10px; padding: 12px 6px; text-align: center; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; min-height: 65px;
+            transition: all 0.15s ease;
+        }
+        .tile:active { background: rgba(255,153,0,0.2); border-color: var(--lcars-tan); }
+        .tile-title { font-weight: bold; font-size: 12px; color: #fff; word-break: break-word; line-height: 1.2; }
+
+        /* Vaste Onderbalk / Cart Footer */
+        .cart-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(0, 0, 0, 0.95); border-top: 2px solid var(--lcars-tan);
+            padding: 10px 12px; border-radius: 16px 16px 0 0; display: flex; flex-direction: column; align-items: center; z-index: 50;
+        }
+        .cart-inner { width: 100%; max-width: 420px; }
+        .cart-summary-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; font-weight: bold; color: var(--lcars-tan); }
+        .cart-items-preview { max-height: 55px; overflow-y: auto; margin-bottom: 6px; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 3px 0; }
+        .cart-mini-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; color: #fff; }
+        .checkout-btn {
+            width: 100%; padding: 10px; background: var(--lcars-blue); color: #000;
+            border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
+            text-align: center; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .checkout-btn:active { background: #fff; }
 
         /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 100; }
-        .modal-content { background: #0f172a; border: 1px solid var(--border-glass); padding: 22px; border-radius: 16px; width: 90%; max-width: 420px; text-align: center; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .modal-content h3 { color: var(--neon-cyan); margin-bottom: 14px; font-size: 17px; }
-        .modal-content label { display: block; font-size: 11px; font-weight: 700; text-align: left; margin-top: 10px; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase; }
-        .modal-content input, .modal-content select { width: 100%; padding: 10px; font-size: 14px; text-align: center; border: 1px solid var(--border-glass); border-radius: 8px; background: #070a12; font-weight: 600; color: white; outline: none; }
-        .modal-content input:focus, .modal-content select:focus { border-color: var(--neon-cyan); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; z-index: 100; padding: 12px; }
+        .modal-content { background: #000; border: 2px solid var(--lcars-orange); border-radius: 16px; padding: 18px; width: 100%; max-width: 380px; text-align: center; max-height: 85vh; overflow-y: auto; }
+        .modal-content h3 { color: var(--lcars-orange); margin-bottom: 12px; font-size: 16px; text-transform: uppercase; }
+        .modal-content label { display: block; font-size: 11px; font-weight: bold; text-align: left; margin-top: 8px; margin-bottom: 2px; color: var(--lcars-tan); text-transform: uppercase; }
+        .modal-content input, .modal-content select { width: 100%; padding: 9px; font-size: 13px; text-align: center; border: 1px solid var(--lcars-orange); border-radius: 6px; background: #111; font-weight: bold; color: white; outline: none; }
         
-        .modal-buttons { display: flex; gap: 10px; margin-top: 15px; }
-        .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; }
-        .btn-cancel { background: #1e293b; color: var(--text-muted); }
-        .btn-confirm { background: var(--neon-cyan); color: #030508; }
-        .btn-excel { background: var(--neon-green); color: #030508; }
+        .modal-buttons { display: flex; gap: 8px; margin-top: 12px; }
+        .modal-buttons button { flex: 1; padding: 9px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; }
+        .btn-cancel { background: var(--lcars-gray); color: #fff; }
+        .btn-confirm { background: var(--lcars-orange); color: #000; }
+        .btn-excel { background: var(--lcars-blue); color: #000; }
 
-        .manage-list, .diary-list { max-height: 220px; overflow-y: auto; text-align: left; margin-bottom: 14px; border: 1px solid var(--border-glass); padding: 8px; border-radius: 10px; background: #070a12; }
-        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; color: var(--text-main); }
-        .delete-btn { background: var(--neon-red); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 700; }
+        .manage-list, .diary-list { max-height: 200px; overflow-y: auto; text-align: left; margin-bottom: 12px; border: 1px solid var(--lcars-gray); padding: 6px; border-radius: 8px; background: #070a12; }
+        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12px; color: #fff; }
+        .delete-btn { background: var(--lcars-red); color: white; border: none; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
         
-        .diary-day-card { background: #070a12; border: 1px solid var(--border-glass); border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: left; }
-        .diary-date { font-weight: 700; font-size: 13px; color: var(--neon-cyan); margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .diary-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .diary-day-card { background: #070a12; border: 1px solid var(--lcars-orange); border-radius: 8px; padding: 10px; margin-bottom: 8px; text-align: left; }
+        .diary-date { font-weight: bold; font-size: 12px; color: var(--lcars-orange); margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; display: flex; justify-content: space-between; align-items: center; }
+        .diary-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--lcars-tan); padding: 2px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); }
 
-        .sync-status { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .sync-status { font-size: 10px; color: var(--lcars-tan); }
     </style>
 </head>
 <body>
 
-    <header>
-        <div>
-            <div class="app-title">🍽️ ETEN & DRINKEN MONITOR</div>
-            <div class="sync-status" id="syncStatus">Cloud: Niet ingesteld</div>
+    <!-- Top LCARS Frame -->
+    <div class="lcars-top-frame">
+        <div class="lcars-top-row">
+            <div class="lcars-elbow-top">SYS-03</div>
+            <div class="lcars-top-bar" id="syncStatus">CLOUD: ONLINE</div>
         </div>
-        <div class="header-btns">
-            <button class="icon-btn" onclick="openReportModal()" title="Periode Rapport / PDF">📄</button>
-            <button class="icon-btn" onclick="openDiaryModal()" title="Dagboek / Overzicht">📊</button>
-            <button class="icon-btn" onclick="openManagerModal()" title="Tegels Beheren">⚙️</button>
-            <button class="icon-btn" onclick="openSettingsModal()" title="Cloud & Tijd Instellingen">☁️</button>
+        <div class="lcars-header-title">
+            <span>🍽️ ETEN & DRINKEN</span>
+            <span style="font-size:11px; color:var(--lcars-tan);" id="todayDateStr">Vandaag</span>
         </div>
-    </header>
-
-    <!-- Automatische PDF Melding & Knop -->
-    <div class="auto-pdf-banner" id="autoPdfBanner" style="width:100%; max-width:500px;">
-        <div class="auto-pdf-title">⏰ Tijd bereikt! Eten & Drinken PDF nog niet gemaakt</div>
-        <div style="font-size: 12px; color: var(--text-main);">Genereer en download het rapport om de melding te voltooien.</div>
-        <button class="btn-auto-pdf" onclick="generateAutoPDF()">📄 GENEREER DAG-PDF NU</button>
     </div>
 
-    <div class="main-container">
+    <!-- Automatische PDF Melding -->
+    <div class="auto-pdf-banner" id="autoPdfBanner">
+        <div class="auto-pdf-title">⏰ TIJD BEREIKT! RAPPORT NOG NIET GEMAAKT</div>
+        <div style="font-size: 11px; color: #fff;">Genereer en download het rapport om de melding te voltooien.</div>
+        <button class="btn-auto-pdf" onclick="playBeep(); generateAutoPDF()">📄 GENEREER DAG-PDF</button>
+    </div>
+
+    <!-- Header Icon Knopjes (Navigatie) -->
+    <div class="header-btns">
+        <button class="icon-btn tan" onclick="playBeep(); openReportModal()" title="PDF">📄 RAPPORT</button>
+        <button class="icon-btn blue" onclick="playBeep(); openDiaryModal()" title="Dagboek">📊 OVERZICHT</button>
+        <button class="icon-btn" onclick="playBeep(); openManagerModal()" title="Beheer">⚙️ TEGELS</button>
+        <button class="icon-btn red" onclick="playBeep(); openSettingsModal()" title="Cloud">☁️ CLOUD</button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="lcars-mobile-container">
         <div class="today-widget">
             <div>
                 <div class="today-widget-title">Totaal Vocht Vandaag</div>
-                <div class="today-widget-date" id="todayDateStr">Vandaag</div>
+                <div class="today-widget-date">Consumptie</div>
             </div>
             <div class="today-widget-value" id="todayTotalFluid">0 ml</div>
         </div>
 
         <div class="categories">
-            <button class="cat-btn active" onclick="filterCategory('alle')">Alles</button>
-            <button class="cat-btn" onclick="filterCategory('dranken')">Dranken</button>
-            <button class="cat-btn" onclick="filterCategory('maaltijd')">Maaltijden</button>
-            <button class="cat-btn" onclick="filterCategory('snacks')">Snacks</button>
+            <button class="cat-btn active" onclick="playBeep(); filterCategory('alle')">Alles</button>
+            <button class="cat-btn" onclick="playBeep(); filterCategory('dranken')">Dranken</button>
+            <button class="cat-btn" onclick="playBeep(); filterCategory('maaltijd')">Maaltijd</button>
+            <button class="cat-btn" onclick="playBeep(); filterCategory('snacks')">Snacks</button>
         </div>
         <div class="tile-grid" id="tileGrid"></div>
     </div>
 
+    <!-- Vaste Onderbalk / Cart -->
     <div class="cart-footer">
         <div class="cart-inner">
             <div class="cart-summary-bar">
-                <span>Sessie Items: <span id="totalCount" style="color:var(--neon-cyan);">0</span></span>
-                <span>Sessie Vocht: <span id="sessionFluid" style="color:var(--neon-green);">0 ml</span></span>
+                <span>Items: <span id="totalCount" style="color:var(--lcars-orange);">0</span></span>
+                <span>Vocht: <span id="sessionFluid" style="color:var(--lcars-blue);">0 ml</span></span>
             </div>
 
             <div class="cart-items-preview" id="cartPreview">
-                <span style="color: var(--text-muted); font-size: 12px; display: block; text-align: center; padding: 6px 0;">Nog niets geselecteerd</span>
+                <span style="color: var(--lcars-tan); font-size: 11px; display: block; text-align: center; padding: 4px 0;">Geen items geselecteerd</span>
             </div>
 
-            <button class="checkout-btn" onclick="checkout()">BOEK NAAR DAGBOEK</button>
+            <button class="checkout-btn" onclick="playBeep(); checkout()">BOEK NAAR DAGBOEK</button>
         </div>
     </div>
 
@@ -145,8 +233,8 @@
             <h3 id="modalTitle">Hoeveelheid</h3>
             <input type="number" id="amountInput" placeholder="Bijv. 250">
             <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">Annuleren</button>
-                <button class="btn-confirm" onclick="confirmAmount()">Toevoegen</button>
+                <button class="btn-cancel" onclick="closeModal()">ANNULEREN</button>
+                <button class="btn-confirm" onclick="playBeep(); confirmAmount()">TOEVOEGEN</button>
             </div>
         </div>
     </div>
@@ -159,20 +247,20 @@
             <input type="date" id="startDate">
             <label>Einddatum:</label>
             <input type="date" id="endDate">
-            <div class="modal-buttons" style="flex-direction:column; gap:8px;">
-                <button class="btn-confirm" onclick="generatePDFReport()">📄 Open & Print PDF</button>
-                <button class="btn-excel" onclick="generateExcelReport()">📊 Exporteer naar Excel (CSV)</button>
-                <button class="btn-cancel" onclick="closeReportModal()">Sluiten</button>
+            <div class="modal-buttons" style="flex-direction:column; gap:6px;">
+                <button class="btn-confirm" onclick="playBeep(); generatePDFReport()">📄 OPEN & PRINT PDF</button>
+                <button class="btn-excel" onclick="playBeep(); generateExcelReport()">📊 EXPORTEER EXCEL (CSV)</button>
+                <button class="btn-cancel" onclick="closeReportModal()">SLUITEN</button>
             </div>
         </div>
     </div>
 
-    <!-- POPUP 3: DAGBOEK / OVERZICHT -->
+    <!-- POPUP 3: DAGBOEK -->
     <div class="modal" id="diaryModal">
-        <div class="modal-content" style="max-width: 420px;">
+        <div class="modal-content" style="max-width: 380px;">
             <h3>Dagboek & Overzicht</h3>
             <div class="diary-list" id="diaryListContainer"></div>
-            <button class="btn-confirm" onclick="closeDiaryModal()" style="width:100%;">Sluiten</button>
+            <button class="btn-confirm" onclick="closeDiaryModal()" style="width:100%;">SLUITEN</button>
         </div>
     </div>
 
@@ -181,43 +269,60 @@
         <div class="modal-content">
             <h3>Tegels Beheren</h3>
             <div class="manage-list" id="manageList"></div>
-            <hr style="margin: 15px 0; border:0; border-top:1px solid var(--border-glass);">
+            <hr style="margin: 10px 0; border:0; border-top:1px solid var(--lcars-orange);">
             <label>Nieuw product toevoegen:</label>
             <input type="text" id="newProdName" placeholder="Productnaam">
             <select id="newProdCategory">
                 <option value="dranken">Dranken</option>
-                <option value="maaltijd">Maaltijden</option>
+                <option value="maaltijd">Maaltijd</option>
                 <option value="snacks">Snacks</option>
             </select>
             <select id="newProdUnit">
                 <option value="ml">Milliliter (ml)</option>
                 <option value="stuks">Stuks / Portie</option>
             </select>
-            <div class="modal-buttons" style="margin-top: 15px;">
-                <button class="btn-cancel" onclick="closeManagerModal()">Sluiten</button>
-                <button class="btn-confirm" onclick="addNewProduct()">Toevoegen</button>
+            <div class="modal-buttons" style="margin-top: 10px;">
+                <button class="btn-cancel" onclick="closeManagerModal()">SLUITEN</button>
+                <button class="btn-confirm" onclick="playBeep(); addNewProduct()">TOEVOEGEN</button>
             </div>
         </div>
     </div>
 
-    <!-- POPUP 5: CLOUD & TIJD INSTELLINGEN -->
+    <!-- POPUP 5: CLOUD & TIJD -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
-            <h3>Instellingen & Cloud</h3>
+            <h3>Cloud & PDF Tijd</h3>
             <label>Automatische PDF Tijd:</label>
             <input type="time" id="configPdfTime" value="17:00">
-            <label style="margin-top: 10px;">JSONBin API Key:</label>
+            <label style="margin-top: 8px;">JSONBin API Key:</label>
             <input type="text" id="apiKeyInput" placeholder="API Key ($2a$10$...)">
             <label>JSONBin Bin ID:</label>
             <input type="text" id="binIdInput" placeholder="Bin ID">
-            <div class="modal-buttons" style="margin-top: 15px;">
-                <button class="btn-cancel" onclick="closeSettingsModal()">Sluiten</button>
-                <button class="btn-confirm" onclick="saveSettings()">Opslaan & Sync</button>
+            <div class="modal-buttons" style="margin-top: 12px;">
+                <button class="btn-cancel" onclick="closeSettingsModal()">SLUITEN</button>
+                <button class="btn-confirm" onclick="playBeep(); saveSettings()">OPSLAAN & SYNC</button>
             </div>
         </div>
     </div>
 
     <script>
+        function playBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.08);
+            } catch(e) {}
+        }
+
         let products = [
             { id: 1, name: 'Koffie', category: 'dranken', unit: 'ml' },
             { id: 2, name: 'Water', category: 'dranken', unit: 'ml' },
@@ -239,7 +344,7 @@
 
         window.onload = async function() {
             const todayStr = new Date().toISOString().split('T')[0];
-            document.getElementById('todayDateStr').innerText = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+            document.getElementById('todayDateStr').innerText = new Date().toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
             
             document.getElementById('startDate').value = todayStr;
             document.getElementById('endDate').value = todayStr;
@@ -285,11 +390,11 @@
 
         async function syncWithCloud(showAlert) {
             if (!apiKey) {
-                if (showAlert) alert('Stel eerst je API Key in via het wolkje (☁️).');
+                if (showAlert) alert('Stel eerst je API Key in.');
                 return;
             }
 
-            document.getElementById('syncStatus').innerText = 'Cloud: Synchroniseren...';
+            document.getElementById('syncStatus').innerText = 'CLOUD: SYNCING...';
 
             try {
                 if (!binId) {
@@ -325,15 +430,14 @@
                         pdfGeneratedDays = getData.record.pdfGeneratedDays;
                         localStorage.setItem('food_pdf_generated', JSON.stringify(pdfGeneratedDays));
                     }
-                    document.getElementById('syncStatus').innerText = 'Cloud: Verbonden';
+                    document.getElementById('syncStatus').innerText = 'CLOUD: ONLINE';
                     if (showAlert) alert('Verbonden & gesynchroniseerd!');
                 }
                 renderTiles(currentCategory);
                 updateTodayWidget();
                 checkAutoPDFTrigger();
             } catch (error) {
-                console.error(error);
-                document.getElementById('syncStatus').innerText = 'Cloud: Fout bij sync';
+                document.getElementById('syncStatus').innerText = 'CLOUD: ERROR';
             }
         }
 
@@ -348,10 +452,9 @@
                     },
                     body: JSON.stringify({ products: products, diary: diary, pdfTargetTime: pdfTargetTime, pdfGeneratedDays: pdfGeneratedDays })
                 });
-                document.getElementById('syncStatus').innerText = 'Cloud: Opgeslagen';
+                document.getElementById('syncStatus').innerText = 'CLOUD: SAVED';
             } catch (error) {
-                console.error(error);
-                document.getElementById('syncStatus').innerText = 'Cloud: Opslaan mislukt';
+                document.getElementById('syncStatus').innerText = 'CLOUD: ERROR';
             }
         }
 
@@ -379,7 +482,7 @@
             filtered.forEach(function(product) {
                 const tile = document.createElement('div');
                 tile.className = 'tile';
-                tile.onclick = function() { openModal(product); };
+                tile.onclick = function() { playBeep(); openModal(product); };
                 tile.innerHTML = '<div class="tile-title">' + product.name + '</div>';
                 grid.appendChild(tile);
             });
@@ -428,7 +531,7 @@
             let sessionFluid = 0;
 
             if (cart.length === 0) {
-                previewContainer.innerHTML = '<span style="color: var(--text-muted); font-size: 12px; display: block; text-align: center; padding: 6px 0;">Nog niets geselecteerd</span>';
+                previewContainer.innerHTML = '<span style="color: var(--lcars-tan); font-size: 11px; display: block; text-align: center; padding: 4px 0;">Geen items geselecteerd</span>';
             } else {
                 cart.forEach(function(item) {
                     if (item.unit === 'ml') sessionFluid += item.amount;
@@ -457,7 +560,7 @@
 
             await pushToCloud();
             updateTodayWidget();
-            alert('Boeking succesvol opgeslagen en gesynchroniseerd!');
+            alert('Boeking opgeslagen en gesynchroniseerd!');
             cart = [];
             updateUI();
         }
@@ -471,31 +574,17 @@
             }
         }
 
-        function openReportModal() {
-            document.getElementById('reportModal').style.display = 'flex';
-        }
-
-        function closeReportModal() {
-            document.getElementById('reportModal').style.display = 'none';
-        }
+        function openReportModal() { document.getElementById('reportModal').style.display = 'flex'; }
+        function closeReportModal() { document.getElementById('reportModal').style.display = 'none'; }
 
         function generatePDFReport() {
             const start = document.getElementById('startDate').value;
             const end = document.getElementById('endDate').value;
-
-            if (!start || !end) {
-                alert('Selecteer een start- en einddatum.');
-                return;
-            }
-
             const filtered = diary.filter(function(entry) { return entry.date >= start && entry.date <= end; });
 
-            if (filtered.length === 0) {
-                alert('Geen gegevens gevonden in deze periode.');
-                return;
-            }
+            if (filtered.length === 0) { alert('Geen gegevens in deze periode.'); return; }
 
-            let reportHTML = '<html><head><title>Eten & Drinken Rapport</title><style>body { font-family: Arial, sans-serif; padding: 25px; color: #1e293b; } h2 { color: #0f172a; border-bottom: 2px solid #00f2fe; padding-bottom: 8px; } table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; } th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; } th { background: #f1f5f9; }</style></head><body>';
+            let reportHTML = '<html><head><title>Eten & Drinken Rapport</title><style>body { font-family: Arial, sans-serif; padding: 25px; color: #1e293b; } h2 { color: #0f172a; border-bottom: 2px solid #ff9900; padding-bottom: 8px; } table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; } th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; } th { background: #f1f5f9; }</style></head><body>';
             reportHTML += '<h2>🍽️ Eten & Drinken Rapport</h2>';
             reportHTML += '<div style="font-size:12px; color:#64748b; margin-bottom:20px;">Periode: ' + start + ' t/m ' + end + '</div>';
 
@@ -506,12 +595,10 @@
                     if (i.unit === 'ml') dayFluid += i.amount;
                     rows += '<tr><td>' + i.name + '</td><td>' + (i.time || '-') + '</td><td><b>' + i.amount + ' ' + i.unit + '</b></td></tr>';
                 });
-
-                reportHTML += '<div style="margin-bottom:20px; border:1px solid #cbd5e1; padding:12px; border-radius:8px;"><div style="font-weight:bold; font-size:14px; background:#f1f5f9; padding:8px; display:flex; justify-content:space-between; border-radius:4px;"><span>Datum: ' + entry.date + '</span><span style="color:#0097a7;">Totaal Vocht: ' + dayFluid + ' ml</span></div><table><tr><th>Product</th><th>Tijd</th><th>Hoeveelheid</th></tr>' + rows + '</table></div>';
+                reportHTML += '<div style="margin-bottom:20px; border:1px solid #cbd5e1; padding:12px; border-radius:8px;"><div style="font-weight:bold; font-size:14px; background:#f1f5f9; padding:8px; display:flex; justify-content:space-between; border-radius:4px;"><span>Datum: ' + entry.date + '</span><span style="color:#ff9900;">Totaal Vocht: ' + dayFluid + ' ml</span></div><table><tr><th>Product</th><th>Tijd</th><th>Hoeveelheid</th></tr>' + rows + '</table></div>';
             });
 
             reportHTML += '<script>window.onload = function() { window.print(); };<\/script></body></html>';
-
             const win = window.open('', '_blank');
             win.document.write(reportHTML);
             win.document.close();
@@ -521,18 +608,9 @@
         function generateExcelReport() {
             const start = document.getElementById('startDate').value;
             const end = document.getElementById('endDate').value;
-
-            if (!start || !end) {
-                alert('Selecteer een start- en einddatum.');
-                return;
-            }
-
             const filtered = diary.filter(function(entry) { return entry.date >= start && entry.date <= end; });
 
-            if (filtered.length === 0) {
-                alert('Geen gegevens gevonden in deze periode.');
-                return;
-            }
+            if (filtered.length === 0) { alert('Geen gegevens in deze periode.'); return; }
 
             let csv = 'Datum;Tijd;Product;Hoeveelheid;Eenheid\n';
             filtered.forEach(function(entry) {
@@ -554,30 +632,25 @@
             container.innerHTML = '';
 
             if (diary.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 25px;">Nog geen boekingen gevonden.</p>';
+                container.innerHTML = '<p style="color: var(--lcars-tan); text-align: center; padding: 20px; font-size:12px;">Nog geen boekingen gevonden.</p>';
             } else {
                 diary.forEach(function(entry, idx) {
                     let dayFluid = 0;
                     let itemsHtml = '';
-
                     entry.items.forEach(function(i) {
                         if (i.unit === 'ml') dayFluid += i.amount;
                         itemsHtml += '<div class="diary-row"><span>• ' + i.name + ' (' + (i.time || '') + ')</span><span><b>' + i.amount + ' ' + i.unit + '</b></span></div>';
                     });
-
                     const card = document.createElement('div');
                     card.className = 'diary-day-card';
-                    card.innerHTML = '<div class="diary-date"><span>📅 ' + entry.date + '</span><div><span style="color:var(--neon-cyan); margin-right:8px;">Vocht: ' + dayFluid + ' ml</span><button class="delete-btn" onclick="deleteDiaryEntry(' + idx + ')">Wis</button></div></div>' + itemsHtml;
+                    card.innerHTML = '<div class="diary-date"><span>📅 ' + entry.date + '</span><div><span style="color:var(--lcars-orange); margin-right:6px;">Vocht: ' + dayFluid + ' ml</span><button class="delete-btn" onclick="playBeep(); deleteDiaryEntry(' + idx + ')">WIS</button></div></div>' + itemsHtml;
                     container.appendChild(card);
                 });
             }
-
             document.getElementById('diaryModal').style.display = 'flex';
         }
 
-        function closeDiaryModal() {
-            document.getElementById('diaryModal').style.display = 'none';
-        }
+        function closeDiaryModal() { document.getElementById('diaryModal').style.display = 'none'; }
 
         function openSettingsModal() {
             document.getElementById('configPdfTime').value = pdfTargetTime;
@@ -586,12 +659,10 @@
             document.getElementById('settingsModal').style.display = 'flex';
         }
 
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').style.display = 'none';
-        }
+        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
 
         function saveSettings() {
-            pdfTargetTime = document.getElementById('configPdfTime').value || '06:00';
+            pdfTargetTime = document.getElementById('configPdfTime').value || '17:00';
             localStorage.setItem('food_pdf_time', pdfTargetTime);
 
             apiKey = document.getElementById('apiKeyInput').value.trim();
@@ -616,11 +687,10 @@
         function renderManageList() {
             const listContainer = document.getElementById('manageList');
             listContainer.innerHTML = '';
-
             products.forEach(function(prod) {
                 const item = document.createElement('div');
                 item.className = 'manage-item';
-                item.innerHTML = '<span><b>' + prod.name + '</b> <small style="color:var(--text-muted);">(' + prod.category + ')</small></span><button class="delete-btn" onclick="deleteProduct(' + prod.id + ')">Wis</button>';
+                item.innerHTML = '<span><b>' + prod.name + '</b> <small style="color:var(--lcars-tan);">(' + prod.category + ')</small></span><button class="delete-btn" onclick="playBeep(); deleteProduct(' + prod.id + ')">WIS</button>';
                 listContainer.appendChild(item);
             });
         }
@@ -630,10 +700,7 @@
             const category = document.getElementById('newProdCategory').value;
             const unit = document.getElementById('newProdUnit').value;
 
-            if (!name) {
-                alert('Vul een productnaam in.');
-                return;
-            }
+            if (!name) { alert('Vul een productnaam in.'); return; }
 
             const newId = products.length > 0 ? Math.max.apply(null, products.map(function(p) { return p.id; })) + 1 : 1;
             products.push({ id: newId, name: name, category: category, unit: unit });
