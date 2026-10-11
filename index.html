@@ -2,229 +2,124 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
-
-    <title>LCARS - ETEN & DRINKEN MONITOR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eten & Drinken Monitor</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background: #f0f3f8; display: flex; flex-direction: column; height: 100vh; overflow: hidden; color: #333; }
 
-        :root {
-            --lcars-orange: #ff9900;
-            --lcars-tangerine: #ff6600;
-            --lcars-tan: #ffcc99;
-            --lcars-purple: #cc99cc;
-            --lcars-blue: #99ccff;
-            --lcars-red: #cc3333;
-            --lcars-amber: #ffcc00;
-            --lcars-gray: #112233;
-            --lcars-bg: #000000;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Antonio', -apple-system, sans-serif; user-select: none; }
-
-        body {
-            background-color: var(--lcars-bg);
-            color: var(--lcars-orange);
-            width: 100vw; height: 100vh;
-            overflow: hidden;
-            display: flex; flex-direction: column;
-            padding: 8px;
-        }
-
-        /* Top LCARS Header Frame */
-        .lcars-top-frame {
-            display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;
-        }
-
-        .lcars-top-row { display: flex; align-items: center; gap: 6px; }
-
-        .lcars-elbow-top {
-            background: var(--lcars-tan);
-            height: 42px; width: 100px;
-            border-top-left-radius: 22px;
-            display: flex; align-items: flex-end; padding: 4px 8px;
-            color: #000; font-weight: bold; font-size: 15px; letter-spacing: 1px;
-        }
-
-        .lcars-top-bar {
-            flex: 1; height: 20px;
-            background: var(--lcars-orange);
-            border-radius: 0 10px 10px 0;
-            display: flex; align-items: center; justify-content: flex-end;
-            padding-right: 10px; color: #000; font-weight: bold; font-size: 11px;
-        }
-
-        .lcars-header-title {
-            font-size: 17px; font-weight: bold; color: #ffffff;
-            letter-spacing: 1.5px; padding-left: 6px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        header { background: linear-gradient(135deg, #0062cc, #007bff); color: white; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,123,255,0.2); z-index: 10; }
+        .app-title { font-size: 18px; font-weight: 700; letter-spacing: 0.3px; }
+        .header-btns { display: flex; gap: 8px; align-items: center; }
+        .icon-btn { background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: white; width: 38px; height: 38px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+        .icon-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.94); }
 
         /* Automatische PDF-banner */
-        .auto-pdf-banner {
-            background: rgba(255, 153, 0, 0.15); border: 2px solid var(--lcars-orange);
-            border-radius: 10px; padding: 10px; margin-bottom: 8px; text-align: center; display: none;
-        }
-        .auto-pdf-title { font-size: 11px; font-weight: bold; color: var(--lcars-orange); text-transform: uppercase; margin-bottom: 4px; }
-        .btn-auto-pdf { background: var(--lcars-orange); color: #000; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; margin-top: 4px; }
+        .auto-pdf-banner { background: #e6fffa; border: 2px solid #319795; border-radius: 12px; padding: 12px 15px; margin: 12px 15px 0 15px; display: none; text-align: center; animation: pulse 2s infinite; box-shadow: 0 4px 12px rgba(49,151,149,0.2); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(49,151,149, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(49,151,149, 0); } 100% { box-shadow: 0 0 0 0 rgba(49,151,149, 0); } }
+        .auto-pdf-title { font-size: 12px; font-weight: 800; color: #234e52; text-transform: uppercase; margin-bottom: 4px; }
+        .btn-auto-pdf { background: #319795; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; width: 100%; margin-top: 6px; }
 
-        /* Actiebalk / Header Cirkelknopjes */
-        .header-btns { display: flex; gap: 5px; margin-bottom: 8px; }
-        .icon-btn {
-            flex: 1; background: var(--lcars-purple); color: #000; border: none;
-            padding: 7px; font-weight: bold; font-size: 11px; text-transform: uppercase;
-            border-radius: 10px; cursor: pointer; text-align: center;
-        }
-        .icon-btn:active { background: #fff; }
-        .icon-btn.tan { background: var(--lcars-tan); }
-        .icon-btn.blue { background: var(--lcars-blue); }
-        .icon-btn.red { background: var(--lcars-red); color: #fff; }
+        .main-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 220px; }
 
-        /* Main Scrollable Area */
-        .lcars-mobile-container {
-            flex: 1; display: flex; flex-direction: column;
-            gap: 10px; overflow-y: auto; padding-right: 2px; padding-bottom: 110px;
-        }
+        .today-widget { background: white; border-radius: 14px; padding: 15px 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; border-left: 6px solid #17a2b8; }
+        .today-widget-title { font-size: 11px; color: #718096; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 2px; }
+        .today-widget-date { font-size: 13px; color: #4a5568; font-weight: 500; }
+        .today-widget-value { font-size: 22px; font-weight: 800; color: #0097a7; letter-spacing: -0.5px; }
 
-        .today-widget {
-            background: rgba(15, 20, 30, 0.9); border: 2px solid var(--lcars-tan);
-            border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center;
-            position: relative;
-        }
-        .today-widget::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%;
-            background: var(--lcars-tan); border-radius: 8px 0 0 8px;
-        }
-        .today-widget-title { font-size: 10px; color: var(--lcars-tan); font-weight: bold; text-transform: uppercase; }
-        .today-widget-date { font-size: 12px; color: #fff; }
-        .today-widget-value { font-size: 22px; font-weight: bold; color: var(--lcars-orange); }
+        .categories { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .cat-btn { padding: 8px 18px; border: none; background: #e2e8f0; color: #4a5568; cursor: pointer; border-radius: 25px; font-weight: 700; white-space: nowrap; font-size: 13px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .cat-btn.active { background: #007bff; color: white; box-shadow: 0 4px 10px rgba(0,123,255,0.3); }
 
-        .categories { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
-        .cat-btn {
-            padding: 6px 12px; border: 1px solid var(--lcars-blue); background: #000;
-            color: var(--lcars-blue); cursor: pointer; border-radius: 14px; font-weight: bold;
-            white-space: nowrap; font-size: 11px; text-transform: uppercase;
-        }
-        .cat-btn.active { background: var(--lcars-blue); color: #000; border-color: var(--lcars-blue); }
+        .tile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .tile { background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 14px 8px; text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 75px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); transition: all 0.15s ease; }
+        .tile:active { transform: scale(0.96); background: #f7fafc; border-color: #007bff; box-shadow: none; }
+        .tile-title { font-weight: 700; font-size: 13px; color: #2d3748; word-break: break-word; line-height: 1.3; }
 
-        .tile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .tile {
-            background: rgba(10, 15, 25, 0.9); border: 1px solid var(--lcars-orange);
-            border-radius: 10px; padding: 12px 6px; text-align: center; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; min-height: 65px;
-            transition: all 0.15s ease;
-        }
-        .tile:active { background: rgba(255,153,0,0.2); border-color: var(--lcars-tan); }
-        .tile-title { font-weight: bold; font-size: 12px; color: #fff; word-break: break-word; line-height: 1.2; }
+        .cart-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #cbd5e0; padding: 15px 18px; box-shadow: 0 -6px 20px rgba(0,0,0,0.08); border-radius: 24px 24px 0 0; display: flex; flex-direction: column; z-index: 50; }
+        .cart-summary-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: #2d3748; }
+        .cart-items-preview { max-height: 85px; overflow-y: auto; margin-bottom: 12px; border-top: 1px solid #edf2f7; border-bottom: 1px solid #edf2f7; padding: 6px 0; }
+        .cart-mini-item { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; color: #4a5568; font-weight: 500; }
+        .checkout-btn { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(40,167,69,0.3); transition: background 0.2s; }
+        .checkout-btn:active { background: #218838; transform: scale(0.98); }
 
-        /* Vaste Onderbalk / Cart Footer */
-        .cart-footer {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(0, 0, 0, 0.95); border-top: 2px solid var(--lcars-tan);
-            padding: 10px 12px; border-radius: 16px 16px 0 0; display: flex; flex-direction: column; align-items: center; z-index: 50;
-        }
-        .cart-inner { width: 100%; max-width: 420px; }
-        .cart-summary-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; font-weight: bold; color: var(--lcars-tan); }
-        .cart-items-preview { max-height: 55px; overflow-y: auto; margin-bottom: 6px; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 3px 0; }
-        .cart-mini-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; color: #fff; }
-        .checkout-btn {
-            width: 100%; padding: 10px; background: var(--lcars-blue); color: #000;
-            border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
-            text-align: center; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .checkout-btn:active { background: #fff; }
-
-        /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; z-index: 100; padding: 12px; }
-        .modal-content { background: #000; border: 2px solid var(--lcars-orange); border-radius: 16px; padding: 18px; width: 100%; max-width: 380px; text-align: center; max-height: 85vh; overflow-y: auto; }
-        .modal-content h3 { color: var(--lcars-orange); margin-bottom: 12px; font-size: 16px; text-transform: uppercase; }
-        .modal-content label { display: block; font-size: 11px; font-weight: bold; text-align: left; margin-top: 8px; margin-bottom: 2px; color: var(--lcars-tan); text-transform: uppercase; }
-        .modal-content input, .modal-content select { width: 100%; padding: 9px; font-size: 13px; text-align: center; border: 1px solid var(--lcars-orange); border-radius: 6px; background: #111; font-weight: bold; color: white; outline: none; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 100; }
+        .modal-content { background: white; padding: 24px; border-radius: 16px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: modalIn 0.2s ease; }
+        @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        .modal-buttons { display: flex; gap: 8px; margin-top: 12px; }
-        .modal-buttons button { flex: 1; padding: 9px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; }
-        .btn-cancel { background: var(--lcars-gray); color: #fff; }
-        .btn-confirm { background: var(--lcars-orange); color: #000; }
-        .btn-excel { background: var(--lcars-blue); color: #000; }
-
-        .manage-list, .diary-list { max-height: 200px; overflow-y: auto; text-align: left; margin-bottom: 12px; border: 1px solid var(--lcars-gray); padding: 6px; border-radius: 8px; background: #070a12; }
-        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12px; color: #fff; }
-        .delete-btn { background: var(--lcars-red); color: white; border: none; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
+        .modal-content h3 { margin-bottom: 16px; color: #1a202c; font-size: 18px; font-weight: 700; }
+        .modal-content label { display: block; font-size: 12px; font-weight: 700; text-align: left; margin-bottom: 6px; color: #4a5568; text-transform: uppercase; }
+        .modal-content input, .modal-content select { width: 100%; padding: 12px; font-size: 15px; text-align: center; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 14px; outline: none; background: #f8fafc; font-weight: 600; color: #2d3748; transition: border-color 0.2s; }
+        .modal-content input:focus, .modal-content select:focus { border-color: #007bff; background: white; }
         
-        .diary-day-card { background: #070a12; border: 1px solid var(--lcars-orange); border-radius: 8px; padding: 10px; margin-bottom: 8px; text-align: left; }
-        .diary-date { font-weight: bold; font-size: 12px; color: var(--lcars-orange); margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; display: flex; justify-content: space-between; align-items: center; }
-        .diary-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--lcars-tan); padding: 2px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px; transition: opacity 0.2s; }
+        .btn-cancel { background: #edf2f7; color: #4a5568; }
+        .btn-confirm { background: #007bff; color: white; box-shadow: 0 4px 10px rgba(0,123,255,0.25); }
+        .btn-excel { background: #10b981; color: white; }
 
-        .sync-status { font-size: 10px; color: var(--lcars-tan); }
+        .manage-list, .diary-list { max-height: 220px; overflow-y: auto; text-align: left; margin-bottom: 16px; border: 2px solid #edf2f7; padding: 8px; border-radius: 10px; background: #f8fafc; }
+        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #edf2f7; font-size: 14px; }
+        .delete-btn { background: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; }
+        
+        .diary-day-card { background: white; border: 1px solid #cbd5e0; border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: left; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .diary-date { font-weight: 700; font-size: 14px; color: #007bff; margin-bottom: 8px; border-bottom: 2px solid #edf2f7; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .diary-row { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; padding: 3px 0; border-bottom: 1px dashed #f1f5f9; }
+
+        .sync-status { font-size: 11px; color: rgba(255,255,255,0.85); margin-top: 3px; font-weight: 500; }
     </style>
 </head>
 <body>
 
-    <!-- Top LCARS Frame -->
-    <div class="lcars-top-frame">
-        <div class="lcars-top-row">
-            <div class="lcars-elbow-top">SYS-03</div>
-            <div class="lcars-top-bar" id="syncStatus">CLOUD: ONLINE</div>
+    <header>
+        <div>
+            <div class="app-title">Eten & Drinken Monitor</div>
+            <div class="sync-status" id="syncStatus">Cloud: Niet ingesteld</div>
         </div>
-        <div class="lcars-header-title">
-            <span>🍽️ ETEN & DRINKEN</span>
-            <span style="font-size:11px; color:var(--lcars-tan);" id="todayDateStr">Vandaag</span>
+        <div class="header-btns">
+            <button class="icon-btn" onclick="openReportModal()" title="Periode Rapport / PDF">📄</button>
+            <button class="icon-btn" onclick="openDiaryModal()" title="Dagboek / Overzicht">📊</button>
+            <button class="icon-btn" onclick="openManagerModal()" title="Tegels Beheren">⚙️</button>
+            <button class="icon-btn" onclick="openSettingsModal()" title="Cloud & Tijd Instellingen">☁️</button>
         </div>
-    </div>
+    </header>
 
-    <!-- Automatische PDF Melding -->
+    <!-- Automatische PDF Melding & Knop -->
     <div class="auto-pdf-banner" id="autoPdfBanner">
-        <div class="auto-pdf-title">⏰ TIJD BEREIKT! RAPPORT NOG NIET GEMAAKT</div>
-        <div style="font-size: 11px; color: #fff;">Genereer en download het rapport om de melding te voltooien.</div>
-        <button class="btn-auto-pdf" onclick="playBeep(); generateAutoPDF()">📄 GENEREER DAG-PDF</button>
+        <div class="auto-pdf-title">⏰ Tijd bereikt! Dagelijkse Eten & Drinken PDF nog niet gemaakt</div>
+        <div style="font-size: 12px; color: #234e52;">Genereer en download het rapport om de melding te voltooien voor DriveSync.</div>
+        <button class="btn-auto-pdf" onclick="generateAutoPDF()">📄 GENEREER DAG-PDF NU</button>
     </div>
 
-    <!-- Header Icon Knopjes (Navigatie) -->
-    <div class="header-btns">
-        <button class="icon-btn tan" onclick="playBeep(); openReportModal()" title="PDF">📄 RAPPORT</button>
-        <button class="icon-btn blue" onclick="playBeep(); openDiaryModal()" title="Dagboek">📊 OVERZICHT</button>
-        <button class="icon-btn" onclick="playBeep(); openManagerModal()" title="Beheer">⚙️ TEGELS</button>
-        <button class="icon-btn red" onclick="playBeep(); openSettingsModal()" title="Cloud">☁️ CLOUD</button>
-    </div>
-
-    <!-- Main Container -->
-    <div class="lcars-mobile-container">
+    <div class="main-container">
         <div class="today-widget">
             <div>
                 <div class="today-widget-title">Totaal Vocht Vandaag</div>
-                <div class="today-widget-date">Consumptie</div>
+                <div class="today-widget-date" id="todayDateStr">Vandaag</div>
             </div>
             <div class="today-widget-value" id="todayTotalFluid">0 ml</div>
         </div>
 
         <div class="categories">
-            <button class="cat-btn active" onclick="playBeep(); filterCategory('alle')">Alles</button>
-            <button class="cat-btn" onclick="playBeep(); filterCategory('dranken')">Dranken</button>
-            <button class="cat-btn" onclick="playBeep(); filterCategory('maaltijd')">Maaltijd</button>
-            <button class="cat-btn" onclick="playBeep(); filterCategory('snacks')">Snacks</button>
+            <button class="cat-btn active" onclick="filterCategory('alle')">Alles</button>
+            <button class="cat-btn" onclick="filterCategory('dranken')">Dranken</button>
+            <button class="cat-btn" onclick="filterCategory('maaltijd')">Maaltijden</button>
+            <button class="cat-btn" onclick="filterCategory('snacks')">Snacks</button>
         </div>
         <div class="tile-grid" id="tileGrid"></div>
     </div>
 
-    <!-- Vaste Onderbalk / Cart -->
     <div class="cart-footer">
-        <div class="cart-inner">
-            <div class="cart-summary-bar">
-                <span>Items: <span id="totalCount" style="color:var(--lcars-orange);">0</span></span>
-                <span>Vocht: <span id="sessionFluid" style="color:var(--lcars-blue);">0 ml</span></span>
-            </div>
-
-            <div class="cart-items-preview" id="cartPreview">
-                <span style="color: var(--lcars-tan); font-size: 11px; display: block; text-align: center; padding: 4px 0;">Geen items geselecteerd</span>
-            </div>
-
-            <button class="checkout-btn" onclick="playBeep(); checkout()">BOEK NAAR DAGBOEK</button>
+        <div class="cart-summary-bar">
+            <span>Sessie Items: <span id="totalCount" style="color:#007bff;">0</span></span>
+            <span>Sessie Vocht: <span id="sessionFluid" style="color:#0097a7;">0 ml</span></span>
         </div>
+
+        <div class="cart-items-preview" id="cartPreview">
+            <span style="color: #a0aec0; font-size: 12px; display: block; text-align: center; padding: 10px 0;">Nog niets geselecteerd</span>
+        </div>
+
+        <button class="checkout-btn" onclick="checkout()">Boek naar Dagboek</button>
     </div>
 
     <!-- POPUP 1: HOEVEELHEID -->
@@ -233,8 +128,8 @@
             <h3 id="modalTitle">Hoeveelheid</h3>
             <input type="number" id="amountInput" placeholder="Bijv. 250">
             <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">ANNULEREN</button>
-                <button class="btn-confirm" onclick="playBeep(); confirmAmount()">TOEVOEGEN</button>
+                <button class="btn-cancel" onclick="closeModal()">Annuleren</button>
+                <button class="btn-confirm" onclick="confirmAmount()">Toevoegen</button>
             </div>
         </div>
     </div>
@@ -247,20 +142,20 @@
             <input type="date" id="startDate">
             <label>Einddatum:</label>
             <input type="date" id="endDate">
-            <div class="modal-buttons" style="flex-direction:column; gap:6px;">
-                <button class="btn-confirm" onclick="playBeep(); generatePDFReport()">📄 OPEN & PRINT PDF</button>
-                <button class="btn-excel" onclick="playBeep(); generateExcelReport()">📊 EXPORTEER EXCEL (CSV)</button>
-                <button class="btn-cancel" onclick="closeReportModal()">SLUITEN</button>
+            <div class="modal-buttons" style="flex-direction:column; gap:8px;">
+                <button class="btn-confirm" onclick="generatePDFReport()">📄 Open & Print PDF</button>
+                <button class="btn-excel" onclick="generateExcelReport()">📊 Exporteer naar Excel (CSV)</button>
+                <button class="btn-cancel" onclick="closeReportModal()">Sluiten</button>
             </div>
         </div>
     </div>
 
-    <!-- POPUP 3: DAGBOEK -->
+    <!-- POPUP 3: DAGBOEK / OVERZICHT (Met bewerk knop!) -->
     <div class="modal" id="diaryModal">
-        <div class="modal-content" style="max-width: 380px;">
+        <div class="modal-content" style="max-width: 420px;">
             <h3>Dagboek & Overzicht</h3>
             <div class="diary-list" id="diaryListContainer"></div>
-            <button class="btn-confirm" onclick="closeDiaryModal()" style="width:100%;">SLUITEN</button>
+            <button class="btn-confirm" onclick="closeDiaryModal()" style="width:100%;">Sluiten</button>
         </div>
     </div>
 
@@ -269,60 +164,43 @@
         <div class="modal-content">
             <h3>Tegels Beheren</h3>
             <div class="manage-list" id="manageList"></div>
-            <hr style="margin: 10px 0; border:0; border-top:1px solid var(--lcars-orange);">
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #edf2f7;">
             <label>Nieuw product toevoegen:</label>
             <input type="text" id="newProdName" placeholder="Productnaam">
             <select id="newProdCategory">
                 <option value="dranken">Dranken</option>
-                <option value="maaltijd">Maaltijd</option>
+                <option value="maaltijd">Maaltijden</option>
                 <option value="snacks">Snacks</option>
             </select>
             <select id="newProdUnit">
                 <option value="ml">Milliliter (ml)</option>
                 <option value="stuks">Stuks / Portie</option>
             </select>
-            <div class="modal-buttons" style="margin-top: 10px;">
-                <button class="btn-cancel" onclick="closeManagerModal()">SLUITEN</button>
-                <button class="btn-confirm" onclick="playBeep(); addNewProduct()">TOEVOEGEN</button>
+            <div class="modal-buttons" style="margin-top: 15px;">
+                <button class="btn-cancel" onclick="closeManagerModal()">Sluiten</button>
+                <button class="btn-confirm" onclick="addNewProduct()">Toevoegen</button>
             </div>
         </div>
     </div>
 
-    <!-- POPUP 5: CLOUD & TIJD -->
+    <!-- POPUP 5: CLOUD & TIJD INSTELLINGEN -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
-            <h3>Cloud & PDF Tijd</h3>
+            <h3>Instellingen & Cloud</h3>
             <label>Automatische PDF Tijd:</label>
             <input type="time" id="configPdfTime" value="17:00">
-            <label style="margin-top: 8px;">JSONBin API Key:</label>
+            <label style="margin-top: 10px;">JSONBin API Key:</label>
             <input type="text" id="apiKeyInput" placeholder="API Key ($2a$10$...)">
             <label>JSONBin Bin ID:</label>
             <input type="text" id="binIdInput" placeholder="Bin ID">
-            <div class="modal-buttons" style="margin-top: 12px;">
-                <button class="btn-cancel" onclick="closeSettingsModal()">SLUITEN</button>
-                <button class="btn-confirm" onclick="playBeep(); saveSettings()">OPSLAAN & SYNC</button>
+            <div class="modal-buttons" style="margin-top: 15px;">
+                <button class="btn-cancel" onclick="closeSettingsModal()">Sluiten</button>
+                <button class="btn-confirm" onclick="saveSettings()">Opslaan & Sync</button>
             </div>
         </div>
     </div>
 
     <script>
-        function playBeep() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.08);
-                gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.08);
-            } catch(e) {}
-        }
-
         let products = [
             { id: 1, name: 'Koffie', category: 'dranken', unit: 'ml' },
             { id: 2, name: 'Water', category: 'dranken', unit: 'ml' },
@@ -342,9 +220,9 @@
         let apiKey = localStorage.getItem('food_jsonbin_apikey') || '';
         let binId = localStorage.getItem('food_jsonbin_binid') || '';
 
-        window.onload = async function() {
+        window.onload = async () => {
             const todayStr = new Date().toISOString().split('T')[0];
-            document.getElementById('todayDateStr').innerText = new Date().toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
+            document.getElementById('todayDateStr').innerText = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
             
             document.getElementById('startDate').value = todayStr;
             document.getElementById('endDate').value = todayStr;
@@ -388,13 +266,13 @@
             document.getElementById('autoPdfBanner').style.display = 'none';
         }
 
-        async function syncWithCloud(showAlert) {
+        async function syncWithCloud(showAlert = false) {
             if (!apiKey) {
-                if (showAlert) alert('Stel eerst je API Key in.');
+                if (showAlert) alert('Stel eerst je API Key in via het wolkje (☁️).');
                 return;
             }
 
-            document.getElementById('syncStatus').innerText = 'CLOUD: SYNCING...';
+            document.getElementById('syncStatus').innerText = 'Cloud: Synchroniseren...';
 
             try {
                 if (!binId) {
@@ -414,7 +292,7 @@
                     }
                 }
 
-                const getRes = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest', {
+                const getRes = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
                     headers: { 'X-Master-Key': apiKey }
                 });
                 const getData = await getRes.json();
@@ -430,21 +308,22 @@
                         pdfGeneratedDays = getData.record.pdfGeneratedDays;
                         localStorage.setItem('food_pdf_generated', JSON.stringify(pdfGeneratedDays));
                     }
-                    document.getElementById('syncStatus').innerText = 'CLOUD: ONLINE';
+                    document.getElementById('syncStatus').innerText = 'Cloud: Verbonden';
                     if (showAlert) alert('Verbonden & gesynchroniseerd!');
                 }
                 renderTiles(currentCategory);
                 updateTodayWidget();
                 checkAutoPDFTrigger();
             } catch (error) {
-                document.getElementById('syncStatus').innerText = 'CLOUD: ERROR';
+                console.error(error);
+                document.getElementById('syncStatus').innerText = 'Cloud: Fout bij sync';
             }
         }
 
         async function pushToCloud() {
             if (!apiKey || !binId) return;
             try {
-                await fetch('https://api.jsonbin.io/v3/b/' + binId, {
+                await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -452,9 +331,10 @@
                     },
                     body: JSON.stringify({ products: products, diary: diary, pdfTargetTime: pdfTargetTime, pdfGeneratedDays: pdfGeneratedDays })
                 });
-                document.getElementById('syncStatus').innerText = 'CLOUD: SAVED';
+                document.getElementById('syncStatus').innerText = 'Cloud: Opgeslagen';
             } catch (error) {
-                document.getElementById('syncStatus').innerText = 'CLOUD: ERROR';
+                console.error(error);
+                document.getElementById('syncStatus').innerText = 'Cloud: Opslaan mislukt';
             }
         }
 
@@ -462,41 +342,41 @@
             const todayStr = new Date().toISOString().split('T')[0];
             let todayFluid = 0;
 
-            diary.forEach(function(entry) {
+            diary.forEach(entry => {
                 if (entry.date === todayStr) {
-                    entry.items.forEach(function(i) {
+                    entry.items.forEach(i => {
                         if (i.unit === 'ml') todayFluid += i.amount;
                     });
                 }
             });
 
-            document.getElementById('todayTotalFluid').innerText = todayFluid + ' ml';
+            document.getElementById('todayTotalFluid').innerText = `${todayFluid} ml`;
         }
 
-        function renderTiles(category) {
-            currentCategory = category || 'alle';
+        function renderTiles(category = 'alle') {
+            currentCategory = category;
             const grid = document.getElementById('tileGrid');
             grid.innerHTML = '';
-            const filtered = currentCategory === 'alle' ? products : products.filter(function(p) { return p.category === currentCategory; });
+            const filtered = category === 'alle' ? products : products.filter(p => p.category === category);
 
-            filtered.forEach(function(product) {
+            filtered.forEach(product => {
                 const tile = document.createElement('div');
                 tile.className = 'tile';
-                tile.onclick = function() { playBeep(); openModal(product); };
-                tile.innerHTML = '<div class="tile-title">' + product.name + '</div>';
+                tile.onclick = () => openModal(product);
+                tile.innerHTML = `<div class="tile-title">${product.name}</div>`;
                 grid.appendChild(tile);
             });
         }
 
         function filterCategory(category) {
-            document.querySelectorAll('.cat-btn').forEach(function(btn) { btn.classList.remove('active'); });
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             renderTiles(category);
         }
 
         function openModal(product) {
             selectedProduct = product;
-            document.getElementById('modalTitle').innerText = product.name + ' (' + product.unit + ')';
+            document.getElementById('modalTitle').innerText = `${product.name} (${product.unit})`;
             document.getElementById('amountInput').value = product.unit === 'ml' ? '250' : '1';
             document.getElementById('amountModal').style.display = 'flex';
             document.getElementById('amountInput').focus();
@@ -531,19 +411,19 @@
             let sessionFluid = 0;
 
             if (cart.length === 0) {
-                previewContainer.innerHTML = '<span style="color: var(--lcars-tan); font-size: 11px; display: block; text-align: center; padding: 4px 0;">Geen items geselecteerd</span>';
+                previewContainer.innerHTML = '<span style="color: #a0aec0; font-size: 12px; display: block; text-align: center; padding: 10px 0;">Nog niets geselecteerd</span>';
             } else {
-                cart.forEach(function(item) {
+                cart.forEach((item) => {
                     if (item.unit === 'ml') sessionFluid += item.amount;
                     const row = document.createElement('div');
                     row.className = 'cart-mini-item';
-                    row.innerHTML = '<span>' + item.name + '</span><span><b>' + item.amount + ' ' + item.unit + '</b></span>';
+                    row.innerHTML = `<span>${item.name}</span><span><b>${item.amount} ${item.unit}</b></span>`;
                     previewContainer.appendChild(row);
                 });
             }
 
             document.getElementById('totalCount').innerText = cart.length;
-            document.getElementById('sessionFluid').innerText = sessionFluid + ' ml';
+            document.getElementById('sessionFluid').innerText = `${sessionFluid} ml`;
         }
 
         async function checkout() {
@@ -560,7 +440,7 @@
 
             await pushToCloud();
             updateTodayWidget();
-            alert('Boeking opgeslagen en gesynchroniseerd!');
+            alert('Boeking succesvol opgeslagen in de cloud!');
             cart = [];
             updateUI();
         }
@@ -574,31 +454,78 @@
             }
         }
 
-        function openReportModal() { document.getElementById('reportModal').style.display = 'flex'; }
-        function closeReportModal() { document.getElementById('reportModal').style.display = 'none'; }
+        function openReportModal() {
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+        }
 
         function generatePDFReport() {
             const start = document.getElementById('startDate').value;
             const end = document.getElementById('endDate').value;
-            const filtered = diary.filter(function(entry) { return entry.date >= start && entry.date <= end; });
 
-            if (filtered.length === 0) { alert('Geen gegevens in deze periode.'); return; }
+            if (!start || !end) {
+                alert('Selecteer een start- en einddatum.');
+                return;
+            }
 
-            let reportHTML = '<html><head><title>Eten & Drinken Rapport</title><style>body { font-family: Arial, sans-serif; padding: 25px; color: #1e293b; } h2 { color: #0f172a; border-bottom: 2px solid #ff9900; padding-bottom: 8px; } table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; } th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; } th { background: #f1f5f9; }</style></head><body>';
-            reportHTML += '<h2>🍽️ Eten & Drinken Rapport</h2>';
-            reportHTML += '<div style="font-size:12px; color:#64748b; margin-bottom:20px;">Periode: ' + start + ' t/m ' + end + '</div>';
+            const filtered = diary.filter(entry => entry.date >= start && entry.date <= end);
 
-            filtered.forEach(function(entry) {
+            if (filtered.length === 0) {
+                alert('Geen gegevens gevonden in deze periode.');
+                return;
+            }
+
+            let reportHTML = `
+                <html>
+                <head>
+                    <title>Inname Rapport ${start} t/m ${end}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 25px; color: #333; }
+                        h2 { color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 8px; }
+                        .day-section { margin-bottom: 20px; border: 1px solid #cbd5e0; padding: 12px; border-radius: 8px; }
+                        .day-header { font-weight: bold; font-size: 15px; background: #f7fafc; padding: 8px; display: flex; justify-content: space-between; border-radius: 4px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                        th, td { border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 13px; text-align: left; }
+                        th { background: #edf2f7; }
+                        .total-fluid { font-weight: bold; color: #0097a7; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Eten & Drinken Rapport</h2>
+                    <p><b>Periode:</b> ${start} t/m ${end}</p>
+            `;
+
+            filtered.forEach(entry => {
                 let dayFluid = 0;
                 let rows = '';
-                entry.items.forEach(function(i) {
+                entry.items.forEach(i => {
                     if (i.unit === 'ml') dayFluid += i.amount;
-                    rows += '<tr><td>' + i.name + '</td><td>' + (i.time || '-') + '</td><td><b>' + i.amount + ' ' + i.unit + '</b></td></tr>';
+                    rows += `<tr><td>${i.name}</td><td>${i.time || '-'}</td><td><b>${i.amount} ${i.unit}</b></td></tr>`;
                 });
-                reportHTML += '<div style="margin-bottom:20px; border:1px solid #cbd5e1; padding:12px; border-radius:8px;"><div style="font-weight:bold; font-size:14px; background:#f1f5f9; padding:8px; display:flex; justify-content:space-between; border-radius:4px;"><span>Datum: ' + entry.date + '</span><span style="color:#ff9900;">Totaal Vocht: ' + dayFluid + ' ml</span></div><table><tr><th>Product</th><th>Tijd</th><th>Hoeveelheid</th></tr>' + rows + '</table></div>';
+
+                reportHTML += `
+                    <div class="day-section">
+                        <div class="day-header">
+                            <span>Datum: ${entry.date} (${entry.timestamp || ''})</span>
+                            <span class="total-fluid">Totaal Vocht: ${dayFluid} ml</span>
+                        </div>
+                        <table>
+                            <tr><th>Product</th><th>Tijd</th><th>Hoeveelheid</th></tr>
+                            ${rows}
+                        </table>
+                    </div>
+                `;
             });
 
-            reportHTML += '<script>window.onload = function() { window.print(); };<\/script></body></html>';
+            reportHTML += `
+                <script>window.onload = function() { window.print(); }<\/script>
+                </body>
+                </html>
+            `;
+
             const win = window.open('', '_blank');
             win.document.write(reportHTML);
             win.document.close();
@@ -608,21 +535,30 @@
         function generateExcelReport() {
             const start = document.getElementById('startDate').value;
             const end = document.getElementById('endDate').value;
-            const filtered = diary.filter(function(entry) { return entry.date >= start && entry.date <= end; });
 
-            if (filtered.length === 0) { alert('Geen gegevens in deze periode.'); return; }
+            if (!start || !end) {
+                alert('Selecteer een start- en einddatum.');
+                return;
+            }
+
+            const filtered = diary.filter(entry => entry.date >= start && entry.date <= end);
+
+            if (filtered.length === 0) {
+                alert('Geen gegevens gevonden in deze periode.');
+                return;
+            }
 
             let csv = 'Datum;Tijd;Product;Hoeveelheid;Eenheid\n';
-            filtered.forEach(function(entry) {
-                entry.items.forEach(function(i) {
-                    csv += '"' + entry.date + '";"' + (entry.timestamp || '') + '";"' + i.name + '";"' + i.amount + '";"' + i.unit + '"\n';
+            filtered.forEach(entry => {
+                entry.items.forEach(i => {
+                    csv += `"${entry.date}";"${entry.timestamp || ''}";"${i.name}";"${i.amount}";"${i.unit}"\n`;
                 });
             });
 
             const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'Eten_Drinken_Rapport_' + start + '_tot_' + end + '.csv';
+            link.download = `Eten_Drinken_Rapport_${start}_tot_${end}.csv`;
             link.click();
             closeReportModal();
         }
@@ -632,25 +568,39 @@
             container.innerHTML = '';
 
             if (diary.length === 0) {
-                container.innerHTML = '<p style="color: var(--lcars-tan); text-align: center; padding: 20px; font-size:12px;">Nog geen boekingen gevonden.</p>';
+                container.innerHTML = '<p style="color: #a0aec0; text-align: center; padding: 25px;">Nog geen boekingen gevonden.</p>';
             } else {
-                diary.forEach(function(entry, idx) {
+                diary.forEach((entry, idx) => {
                     let dayFluid = 0;
                     let itemsHtml = '';
-                    entry.items.forEach(function(i) {
+
+                    entry.items.forEach(i => {
                         if (i.unit === 'ml') dayFluid += i.amount;
-                        itemsHtml += '<div class="diary-row"><span>• ' + i.name + ' (' + (i.time || '') + ')</span><span><b>' + i.amount + ' ' + i.unit + '</b></span></div>';
+                        itemsHtml += `<div class="diary-row"><span>• ${i.name} (${i.time || ''})</span><span><b>${i.amount} ${i.unit}</b></span></div>`;
                     });
+
                     const card = document.createElement('div');
                     card.className = 'diary-day-card';
-                    card.innerHTML = '<div class="diary-date"><span>📅 ' + entry.date + '</span><div><span style="color:var(--lcars-orange); margin-right:6px;">Vocht: ' + dayFluid + ' ml</span><button class="delete-btn" onclick="playBeep(); deleteDiaryEntry(' + idx + ')">WIS</button></div></div>' + itemsHtml;
+                    card.innerHTML = `
+                        <div class="diary-date">
+                            <span>📅 ${entry.date} (${entry.timestamp || ''})</span>
+                            <div>
+                                <span style="color:#0097a7; margin-right:8px;">Vocht: ${dayFluid} ml</span>
+                                <button class="delete-btn" onclick="deleteDiaryEntry(${idx})">Wis</button>
+                            </div>
+                        </div>
+                        ${itemsHtml}
+                    `;
                     container.appendChild(card);
                 });
             }
+
             document.getElementById('diaryModal').style.display = 'flex';
         }
 
-        function closeDiaryModal() { document.getElementById('diaryModal').style.display = 'none'; }
+        function closeDiaryModal() {
+            document.getElementById('diaryModal').style.display = 'none';
+        }
 
         function openSettingsModal() {
             document.getElementById('configPdfTime').value = pdfTargetTime;
@@ -659,7 +609,9 @@
             document.getElementById('settingsModal').style.display = 'flex';
         }
 
-        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
 
         function saveSettings() {
             pdfTargetTime = document.getElementById('configPdfTime').value || '17:00';
@@ -667,8 +619,8 @@
 
             apiKey = document.getElementById('apiKeyInput').value.trim();
             binId = document.getElementById('binIdInput').value.trim();
-            localStorage.setItem('food_jsonbin_apikey', apiKey);
-            localStorage.setItem('food_jsonbin_binid', binId);
+            localStorage.setItem('jsonbin_apikey', apiKey);
+            localStorage.setItem('jsonbin_binid', binId);
             closeSettingsModal();
             syncWithCloud(true);
             checkAutoPDFTrigger();
@@ -687,10 +639,14 @@
         function renderManageList() {
             const listContainer = document.getElementById('manageList');
             listContainer.innerHTML = '';
-            products.forEach(function(prod) {
+
+            products.forEach((prod) => {
                 const item = document.createElement('div');
                 item.className = 'manage-item';
-                item.innerHTML = '<span><b>' + prod.name + '</b> <small style="color:var(--lcars-tan);">(' + prod.category + ')</small></span><button class="delete-btn" onclick="playBeep(); deleteProduct(' + prod.id + ')">WIS</button>';
+                item.innerHTML = `
+                    <span><b>${prod.name}</b> <small style="color:#718096;">(${prod.category})</small></span>
+                    <button class="delete-btn" onclick="deleteProduct(${prod.id})">Wis</button>
+                `;
                 listContainer.appendChild(item);
             });
         }
@@ -700,10 +656,13 @@
             const category = document.getElementById('newProdCategory').value;
             const unit = document.getElementById('newProdUnit').value;
 
-            if (!name) { alert('Vul een productnaam in.'); return; }
+            if (!name) {
+                alert('Vul een productnaam in.');
+                return;
+            }
 
-            const newId = products.length > 0 ? Math.max.apply(null, products.map(function(p) { return p.id; })) + 1 : 1;
-            products.push({ id: newId, name: name, category: category, unit: unit });
+            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+            products.push({ id: newId, name, category, unit });
             
             await pushToCloud();
             document.getElementById('newProdName').value = '';
@@ -712,13 +671,13 @@
 
         async function deleteProduct(id) {
             if (confirm('Weet je zeker dat je deze tegel wilt verwijderen?')) {
-                products = products.filter(function(p) { return p.id !== id; });
+                products = products.filter(p => p.id !== id);
                 await pushToCloud();
                 renderManageList();
             }
         }
 
-        renderTiles('alle');
+        renderTiles();
     </script>
 </body>
 </html>
