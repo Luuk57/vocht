@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eten & Drinken Monitor</title>
+    <title>Tasker - Eten & Drinken Monitor</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background: #f0f3f8; display: flex; flex-direction: column; height: 100vh; overflow: hidden; color: #333; }
@@ -73,7 +73,7 @@
 
     <header>
         <div>
-            <div class="app-title">Eten & Drinken Monitor</div>
+            <div class="app-title">Tasker - Eten & Drinken Monitor</div>
             <div class="sync-status" id="syncStatus">Cloud: Niet ingesteld</div>
         </div>
         <div class="header-btns">
@@ -140,9 +140,9 @@
             <h3>Rapportage & Export</h3>
             <label>Startdatum:</label>
             <input type="date" id="startDate">
-            <label>Einddatum:</label>
+            <label style="margin-top:10px;">Einddatum:</label>
             <input type="date" id="endDate">
-            <div class="modal-buttons" style="flex-direction:column; gap:8px;">
+            <div class="modal-buttons" style="flex-direction:column; gap:8px; margin-top:15px;">
                 <button class="btn-confirm" onclick="generatePDFReport()">📄 Open & Print PDF</button>
                 <button class="btn-excel" onclick="generateExcelReport()">📊 Exporteer naar Excel (CSV)</button>
                 <button class="btn-cancel" onclick="closeReportModal()">Sluiten</button>
@@ -155,7 +155,7 @@
         <div class="modal-content" style="max-width: 420px;">
             <h3>Dagboek & Overzicht</h3>
             <div class="diary-list" id="diaryListContainer"></div>
-            <button class="btn-confirm" onclick="closeDiaryModal()" style="width:100%;">Sluiten</button>
+            <button class="btn-confirm" onclick="closeDiaryModal()" style="width:100%; margin-top:15px;">Sluiten</button>
         </div>
     </div>
 
@@ -166,13 +166,15 @@
             <div class="manage-list" id="manageList"></div>
             <hr style="margin: 15px 0; border:0; border-top:1px solid #edf2f7;">
             <label>Nieuw product toevoegen:</label>
-            <input type="text" id="newProdName" placeholder="Productnaam">
-            <select id="newProdCategory">
+            <input type="text" id="newProdName" placeholder="Productnaam" style="margin-top:6px;">
+            <label style="margin-top:10px;">Categorie:</label>
+            <select id="newProdCategory" style="margin-top:6px;">
                 <option value="dranken">Dranken</option>
                 <option value="maaltijd">Maaltijden</option>
                 <option value="snacks">Snacks</option>
             </select>
-            <select id="newProdUnit">
+            <label style="margin-top:10px;">Eenheid:</label>
+            <select id="newProdUnit" style="margin-top:6px;">
                 <option value="ml">Milliliter (ml)</option>
                 <option value="stuks">Stuks / Portie</option>
             </select>
@@ -188,11 +190,11 @@
         <div class="modal-content">
             <h3>Instellingen & Cloud</h3>
             <label>Automatische PDF Tijd:</label>
-            <input type="time" id="configPdfTime" value="17:00">
+            <input type="time" id="configPdfTime" value="17:00" style="margin-top:6px;">
             <label style="margin-top: 10px;">JSONBin API Key:</label>
-            <input type="text" id="apiKeyInput" placeholder="API Key ($2a$10$...)">
-            <label>JSONBin Bin ID:</label>
-            <input type="text" id="binIdInput" placeholder="Bin ID">
+            <input type="text" id="apiKeyInput" placeholder="API Key" style="margin-top:6px;">
+            <label style="margin-top: 10px;">JSONBin Bin ID:</label>
+            <input type="text" id="binIdInput" placeholder="Bin ID" style="margin-top:6px;">
             <div class="modal-buttons" style="margin-top: 15px;">
                 <button class="btn-cancel" onclick="closeSettingsModal()">Sluiten</button>
                 <button class="btn-confirm" onclick="saveSettings()">Opslaan & Sync</button>
@@ -440,7 +442,7 @@
 
             await pushToCloud();
             updateTodayWidget();
-            alert('Boeking succesvol opgeslagen in de cloud!');
+            alert('Boeking succesvol opgeslagen en gesynchroniseerd!');
             cart = [];
             updateUI();
         }
@@ -619,8 +621,8 @@
 
             apiKey = document.getElementById('apiKeyInput').value.trim();
             binId = document.getElementById('binIdInput').value.trim();
-            localStorage.setItem('jsonbin_apikey', apiKey);
-            localStorage.setItem('jsonbin_binid', binId);
+            localStorage.setItem('food_jsonbin_apikey', apiKey);
+            localStorage.setItem('food_jsonbin_binid', binId);
             closeSettingsModal();
             syncWithCloud(true);
             checkAutoPDFTrigger();
